@@ -46,7 +46,7 @@ func main() {
 	jwtManager := auth.InitJWTManager(envs)
 	service := services.InitServices(repos, redisClient, jwtManager)
 	handler := handlers.InitHandlers(service)
-	appmiddleware := appmiddlewares.InitAppMiddlewares(jwtManager, service)
+	appmiddleware := appmiddlewares.InitAppMiddlewares(jwtManager, service, envs)
 
 	router := server.SetupRoutes(handler, appmiddleware)
 

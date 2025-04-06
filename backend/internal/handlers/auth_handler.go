@@ -88,6 +88,7 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 // @Failure 504 {object} models.ErrorResponse "Request timeout"
 // @Router /login [post]
 func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
+	log.Println("CORS Headers in main handler:", w.Header())
 	ctx := r.Context()
 
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)

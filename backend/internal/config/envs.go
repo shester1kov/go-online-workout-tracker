@@ -19,6 +19,7 @@ type Envs struct {
 	RedisPort        string
 	RedisPassword    string
 	JWTSecureKey     string
+	FrontendUrl      string
 }
 
 func LoadEnvs() *Envs {
@@ -42,5 +43,6 @@ func LoadEnvs() *Envs {
 		RedisPort:        os.Getenv("REDIS_PORT"),
 		RedisPassword:    os.Getenv("REDIS_PASSWORD"),
 		JWTSecureKey:     os.Getenv("JWT_SECURE_KEY"),
+		FrontendUrl:      os.Getenv("FRONTEND_URL"),
 	}
 }

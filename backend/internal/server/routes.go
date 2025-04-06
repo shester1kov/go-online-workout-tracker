@@ -13,6 +13,7 @@ import (
 func SetupRoutes(handlers *handlers.Handlers, appmiddlewares *appmiddlewares.AppMiddlewares) *chi.Mux {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
+	r.Use(appmiddlewares.AppCorsMiddleware.Handler())
 	r.Use(middleware.Recoverer)
 
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
