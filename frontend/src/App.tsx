@@ -6,6 +6,7 @@ import About from './pages/About';
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Exercises from "./pages/Exercises";
+import Profile from "./pages/Profile";
 import { useAuth } from "./hooks/useAuth";
 
 export default function App() {
@@ -38,8 +39,14 @@ export default function App() {
           />
           <Route
             path='/exercises'
-            element={user ? <Exercises /> : <Navigate to='/login' />} />
+            element={user ? <Exercises /> : <Navigate to='/login' />} 
+          />
+          <Route
+            path='/profile'
+            element={user ? <Profile /> : <Navigate to='/login' />} 
+          />
           </Routes>
+
       </main>
 
       <Footer />
