@@ -26,3 +26,20 @@ type ExerciseResponse struct {
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
 }
+
+type ExerciseFilter struct {
+	CategoryID *int
+	Search     *string
+	Page       int
+	Limit      int
+	Offset     int
+	SortBy     string
+	SortOrder  string
+}
+
+type ExerciseListResponse struct {
+	Exercises []ExerciseResponse `json:"exercises"`
+	Total     int                `json:"total"`
+	Page      int                `json:"page"`
+	Limit     int                `json:"limit"`
+}

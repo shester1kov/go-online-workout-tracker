@@ -6,11 +6,9 @@ import (
 	"backend/internal/repository"
 	"context"
 	"database/sql"
-	"encoding/json"
 	"errors"
 	"log"
 	"net/http"
-	"time"
 
 	"github.com/lib/pq"
 	"github.com/redis/go-redis/v9"
@@ -88,45 +86,29 @@ func (s *ExerciseService) CreateExercise(ctx context.Context, req *models.Exerci
 		}
 	}
 
-	s.redis.Del(ctx, exerciseCacheKey)
 	return exercise, nil
 }
 
-func (s *ExerciseService) GetExercises(ctx context.Context) (*[]models.Exercise, error) {
-	val, err := s.redis.Get(ctx, exerciseCacheKey).Result()
-	if err == redis.Nil {
-		log.Println("cache not found, getting data from DB")
-	} else if err != nil {
-		log.Println("error getting data from Redis:", err)
-	} else {
-		var exercises []models.Exercise
+func (s *ExerciseService) GetExercises(ctx context.Context, filter *models.ExerciseFilter) (*[]models.Exercise, int, error) {
 
-		if err := json.Unmarshal([]byte(val), &exercises); err == nil {
-			log.Println("data retrieved from cache")
-			return &exercises, nil
-		}
-
-		log.Println("error deserializing data from cache:", err)
-	}
-
-	exercises, err := s.exerciseRepo.GetExercises(ctx)
+	exercises, total, err := s.exerciseRepo.GetExercises(ctx, filter)
 	if err != nil {
 		switch {
 		case errors.Is(err, context.Canceled):
 			log.Println("Request cancelled:", err)
-			return nil, &apperrors.AppError{
+			return nil, 0, &apperrors.AppError{
 				Code:    http.StatusBadRequest,
 				Message: "Request cancelled",
 			}
 		case errors.Is(err, context.DeadlineExceeded):
 			log.Println("Deadline exceeded:", err)
-			return nil, &apperrors.AppError{
+			return nil, 0, &apperrors.AppError{
 				Code:    http.StatusGatewayTimeout,
 				Message: "Request timeout",
 			}
 		default:
 			log.Println("Unhandled error:", err)
-			return nil, &apperrors.AppError{
+			return nil, 0, &apperrors.AppError{
 				Code:    http.StatusInternalServerError,
 				Message: "Failed to get exercises",
 			}
@@ -134,22 +116,14 @@ func (s *ExerciseService) GetExercises(ctx context.Context) (*[]models.Exercise,
 	}
 
 	if exercises == nil || len(*exercises) == 0 {
-		log.Println(err)
-		return nil, &apperrors.AppError{
+		log.Println("Exercises not found", err)
+		return nil, 0, &apperrors.AppError{
 			Code:    http.StatusNotFound,
 			Message: "Exercises not found",
 		}
 	}
 
-	data, err := json.Marshal(exercises)
-	if err != nil {
-		log.Println("cache serialization error", err)
-	} else {
-		s.redis.Set(ctx, exerciseCacheKey, data, 10*time.Minute)
-		log.Println("data written to cache")
-	}
-
-	return exercises, nil
+	return exercises, total, nil
 }
 
 func (s *ExerciseService) GetExercise(ctx context.Context, id int) (*models.Exercise, error) {
@@ -254,7 +228,6 @@ func (s *ExerciseService) UpdateExercise(ctx context.Context, id int, req *model
 		}
 	}
 
-	s.redis.Del(ctx, exerciseCacheKey)
 	return exercise, nil
 }
 
@@ -292,6 +265,5 @@ func (s *ExerciseService) DeleteExercise(ctx context.Context, id int) error {
 		}
 	}
 
-	s.redis.Del(ctx, exerciseCacheKey)
 	return nil
 }

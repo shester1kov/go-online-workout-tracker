@@ -91,12 +91,18 @@ func (h *ExerciseHandler) CreateExercise(w http.ResponseWriter, r *http.Request)
 
 // GetExercises godoc
 // @Summary Get all exercises
-// @Description Get all exercises from the database
+// @Description Get all exercises from the database with optional filters and pagination
 // @Tags exercises
 // @Accept json
 // @Produce json
+// @Param page query int false "Page number (default is 1)"
+// @Param limit query int false "Number of exercises per page (default is 20)"
+// @Param category_id query int false "Filter by category ID"
+// @Param search query string false "Search by name or description"
+// @Param sort_by query string false "Sort field (default is name)"
+// @Param sort_order query string false "Sort order (default is ascending)"
 // @Success 200 {array} models.ExerciseResponse "List of exercises"
-// @Failure 400 {object} models.ErrorResponse "Request cancelled"
+// @Failure 400 {object} models.ErrorResponse "Bad request"
 // @Failure 401 {object} models.ErrorResponse "Unauthorized"
 // @Failure 403 {object} models.ErrorResponse "Forbidden"
 // @Failure 404 {object} models.ErrorResponse "Exercises not found"
@@ -109,7 +115,9 @@ func (h *ExerciseHandler) GetExercises(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
-	exercises, err := h.exerciseService.GetExercises(ctx)
+	filter := utils.ParseExerciseFilter(r)
+
+	exercises, total, err := h.exerciseService.GetExercises(ctx, filter)
 	if err != nil {
 		log.Println("Failed to fecth exercises:", err)
 		var appErr *apperrors.AppError
@@ -121,10 +129,10 @@ func (h *ExerciseHandler) GetExercises(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var response []models.ExerciseResponse
+	var exerciseResponse []models.ExerciseResponse
 
 	for _, exercise := range *exercises {
-		response = append(response, models.ExerciseResponse{
+		exerciseResponse = append(exerciseResponse, models.ExerciseResponse{
 			ID:          exercise.ID,
 			Name:        exercise.Name,
 			Description: exercise.Description,
@@ -132,6 +140,13 @@ func (h *ExerciseHandler) GetExercises(w http.ResponseWriter, r *http.Request) {
 			CreatedAt:   exercise.CreatedAt,
 			UpdatedAt:   exercise.UpdatedAt,
 		})
+	}
+
+	response := models.ExerciseListResponse{
+		Exercises: exerciseResponse,
+		Total:     total,
+		Page:      filter.Page,
+		Limit:     filter.Limit,
 	}
 
 	w.Header().Set("Content-Type", "application/json")

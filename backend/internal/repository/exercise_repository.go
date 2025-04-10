@@ -4,7 +4,9 @@ import (
 	"backend/internal/models"
 	"context"
 	"database/sql"
+	"fmt"
 	"log"
+	"strings"
 )
 
 type ExerciseRepository struct {
@@ -39,15 +41,46 @@ func (r *ExerciseRepository) CreateExercise(ctx context.Context, exercise *model
 	return nil
 }
 
-func (r *ExerciseRepository) GetExercises(ctx context.Context) (*[]models.Exercise, error) {
-	query := `SELECT id, name, description, category_id, created_at, updated_at
-	FROM Exercises
-	WHERE is_active = TRUE`
+func (r *ExerciseRepository) GetExercises(ctx context.Context, filter *models.ExerciseFilter) (*[]models.Exercise, int, error) {
 
-	rows, err := r.db.QueryContext(ctx, query)
+	var conditions []string
+	var args []interface{}
+	paramIndex := 1
+
+	if filter.CategoryID != nil {
+		conditions = append(conditions, fmt.Sprintf("category_id = $%d", paramIndex))
+		args = append(args, *filter.CategoryID)
+		paramIndex++
+	}
+
+	if filter.Search != nil {
+		conditions = append(conditions, fmt.Sprintf("LOWER(name) LIKE $%d", paramIndex))
+		args = append(args, "%"+strings.ToLower(*filter.Search)+"%")
+		paramIndex++
+	}
+
+	baseQuery := "FROM Exercises WHERE is_active = TRUE"
+
+	if len(conditions) > 0 {
+		baseQuery += " AND " + strings.Join(conditions, " AND ")
+	}
+
+	countQuery := "SELECT COUNT(*) " + baseQuery
+	var total int
+	if err := r.db.QueryRowContext(ctx, countQuery, args...).Scan(&total); err != nil {
+		log.Println("Failed to get total exercises:", err)
+		return nil, 0, err
+	}
+
+	query := "SELECT id, name, description, category_id, created_at, updated_at " + baseQuery
+	query += fmt.Sprintf(" ORDER BY %s %s", filter.SortBy, filter.SortOrder)
+	query += fmt.Sprintf(" LIMIT $%d OFFSET $%d", paramIndex, paramIndex+1)
+	args = append(args, filter.Limit, filter.Offset)
+
+	rows, err := r.db.QueryContext(ctx, query, args...)
 	if err != nil {
 		log.Println("Failed to get exercises:", err)
-		return nil, err
+		return nil, 0, err
 	}
 	defer rows.Close()
 
@@ -66,7 +99,7 @@ func (r *ExerciseRepository) GetExercises(ctx context.Context) (*[]models.Exerci
 		)
 		if err != nil {
 			log.Println("Failed to get exercises rows:", err)
-			return nil, err
+			return nil, 0, err
 		}
 
 		exercises = append(exercises, exercise)
@@ -74,10 +107,10 @@ func (r *ExerciseRepository) GetExercises(ctx context.Context) (*[]models.Exerci
 
 	if err = rows.Err(); err != nil {
 		log.Println("Failed to get exercises rows:", err)
-		return nil, err
+		return nil, 0, err
 	}
 
-	return &exercises, nil
+	return &exercises, total, nil
 }
 
 func (r *ExerciseRepository) GetExercise(ctx context.Context, id int) (*models.Exercise, error) {
