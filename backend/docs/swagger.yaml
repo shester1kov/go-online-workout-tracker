@@ -318,7 +318,32 @@ paths:
     get:
       consumes:
       - application/json
-      description: Get all exercises from the database
+      description: Get all exercises from the database with optional filters and pagination
+      parameters:
+      - description: Page number (default is 1)
+        in: query
+        name: page
+        type: integer
+      - description: Number of exercises per page (default is 20)
+        in: query
+        name: limit
+        type: integer
+      - description: Filter by category ID
+        in: query
+        name: category_id
+        type: integer
+      - description: Search by name or description
+        in: query
+        name: search
+        type: string
+      - description: Sort field (default is name)
+        in: query
+        name: sort_by
+        type: string
+      - description: Sort order (default is ascending)
+        in: query
+        name: sort_order
+        type: string
       produces:
       - application/json
       responses:
@@ -329,7 +354,7 @@ paths:
               $ref: '#/definitions/models.ExerciseResponse'
             type: array
         "400":
-          description: Request cancelled
+          description: Bad request
           schema:
             $ref: '#/definitions/models.ErrorResponse'
         "401":
@@ -671,4 +696,45 @@ paths:
       summary: User registration
       tags:
       - auth
+  /user/{id}/roles:
+    post:
+      description: Endpoint for add role to user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User data
+          schema:
+            $ref: '#/definitions/models.UserResponse'
+        "400":
+          description: Incorrect id
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Role not found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "409":
+          description: User already has this role
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Failed to login user
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "504":
+          description: Request timeout
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Add role to user
+      tags:
+      - user
 swagger: "2.0"

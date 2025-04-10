@@ -355,7 +355,7 @@ const docTemplate = `{
         },
         "/exercises": {
             "get": {
-                "description": "Get all exercises from the database",
+                "description": "Get all exercises from the database with optional filters and pagination",
                 "consumes": [
                     "application/json"
                 ],
@@ -366,6 +366,44 @@ const docTemplate = `{
                     "exercises"
                 ],
                 "summary": "Get all exercises",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Page number (default is 1)",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Number of exercises per page (default is 20)",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Filter by category ID",
+                        "name": "category_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Search by name or description",
+                        "name": "search",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Sort field (default is name)",
+                        "name": "sort_by",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Sort order (default is ascending)",
+                        "name": "sort_order",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "List of exercises",
@@ -377,7 +415,7 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Request cancelled",
+                        "description": "Bad request",
                         "schema": {
                             "$ref": "#/definitions/models.ErrorResponse"
                         }
@@ -880,6 +918,68 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Failed to register user",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "504": {
+                        "description": "Request timeout",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/{id}/roles": {
+            "post": {
+                "description": "Endpoint for add role to user",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Add role to user",
+                "responses": {
+                    "200": {
+                        "description": "User data",
+                        "schema": {
+                            "$ref": "#/definitions/models.UserResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Incorrect id",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Role not found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "User already has this role",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to login user",
                         "schema": {
                             "$ref": "#/definitions/models.ErrorResponse"
                         }
