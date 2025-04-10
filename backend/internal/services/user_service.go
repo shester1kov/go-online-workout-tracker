@@ -29,7 +29,14 @@ func NewUserService(userRepo *repository.UserRepository, roleRepo *repository.Ro
 func (s *UserService) GetUserByID(ctx context.Context, userID int) (*models.User, error) {
 
 	user, err := s.userRepo.GetUserByID(ctx, userID)
-	if err != nil || user == nil {
+	if user == nil {
+		return nil, &apperrors.AppError{
+			Code:    http.StatusNotFound,
+			Message: "User not found",
+		}
+	}
+
+	if err != nil {
 		switch {
 		case errors.Is(err, context.DeadlineExceeded):
 			return nil, &apperrors.AppError{
@@ -56,9 +63,9 @@ func (s *UserService) GetUserByID(ctx context.Context, userID int) (*models.User
 	return user, nil
 }
 
-func (s *UserService) AddRoleToUser(ctx context.Context, req *models.AddRoleToUserRequest) (*models.User, error) {
+func (s *UserService) AddRoleToUser(ctx context.Context, id int, req *models.AddRoleToUserRequest) (*models.User, error) {
 
-	if err := s.userRepo.AddUserRole(ctx, req.UserID, req.RoleID); err != nil {
+	if err := s.userRepo.AddUserRole(ctx, id, req.RoleID); err != nil {
 		var pgErr *pq.Error
 		switch {
 		case errors.As(err, &pgErr) && pgErr.Code == apperrors.PgErrUniqueViolation:
@@ -96,7 +103,7 @@ func (s *UserService) AddRoleToUser(ctx context.Context, req *models.AddRoleToUs
 		}
 	}
 
-	return s.userRepo.GetUserByID(ctx, req.UserID)
+	return s.userRepo.GetUserByID(ctx, id)
 }
 
 func (s *UserService) GetUserRoles(ctx context.Context, userID int) (*[]models.Role, error) {
