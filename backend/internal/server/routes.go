@@ -58,6 +58,10 @@ func SetupRoutes(handlers *handlers.Handlers, appmiddlewares *appmiddlewares.App
 					r.Delete("/{id}", handlers.CategoryHandler.DeleteCategory)
 				})
 			})
+
+			r.Route("/users", func(r chi.Router) {
+				r.Post("/{id}/roles", handlers.UserHandler.AddRoleToUser)
+			})
 		})
 	})
 
