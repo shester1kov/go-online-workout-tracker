@@ -8,19 +8,23 @@ import (
 )
 
 type Services struct {
-	ExerciseService *ExerciseService
-	CategoryService *CategoryService
-	UserService     *UserService
-	AuthService     *AuthService
-	HealthService   *HealthService
+	ExerciseService        *ExerciseService
+	CategoryService        *CategoryService
+	UserService            *UserService
+	AuthService            *AuthService
+	HealthService          *HealthService
+	WorkoutSerivce         *WorkoutSerivce
+	WorkoutExerciseSerivce *WorkoutExerciseSerivce
 }
 
 func InitServices(repos *repository.Repositories, redis *redis.Client, jwtManager *auth.JWTManager) *Services {
 	return &Services{
-		ExerciseService: NewExerciseService(repos.ExerciseRepo, repos.CategoryRepo, redis),
-		CategoryService: NewCategoryService(repos.CategoryRepo, redis),
-		UserService:     NewUserService(repos.UserRepo, repos.RoleRepo),
-		AuthService:     NewAuthService(repos.UserRepo, jwtManager),
-		HealthService:   NewHealthService(repos.DBHeathRepository, redis),
+		ExerciseService:        NewExerciseService(repos.ExerciseRepo, repos.CategoryRepo, redis),
+		CategoryService:        NewCategoryService(repos.CategoryRepo, redis),
+		UserService:            NewUserService(repos.UserRepo, repos.RoleRepo),
+		AuthService:            NewAuthService(repos.UserRepo, jwtManager),
+		HealthService:          NewHealthService(repos.DBHeathRepo, redis),
+		WorkoutSerivce:         NewWorkoutService(repos.WorkoutRepo),
+		WorkoutExerciseSerivce: NewWorkoutExerciseService(repos.WorkoutRepo, repos.WorkoutExerciseRepo, repos.ExerciseRepo),
 	}
 }

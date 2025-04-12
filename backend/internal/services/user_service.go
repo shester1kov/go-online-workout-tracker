@@ -26,10 +26,19 @@ func NewUserService(userRepo *repository.UserRepository, roleRepo *repository.Ro
 	}
 }
 
-func (s *UserService) GetUserByID(ctx context.Context, userID int) (*models.User, error) {
+func (s *UserService) GetUserByID(ctx context.Context) (*models.User, error) {
+	userID, ok := ctx.Value("user_id").(int)
+	if !ok {
+		log.Println("Failed to get user id")
+		return nil, &apperrors.AppError{
+			Code:    http.StatusUnauthorized,
+			Message: "Unauthorized",
+		}
+	}
 
 	user, err := s.userRepo.GetUserByID(ctx, userID)
 	if user == nil {
+		log.Println("User not found")
 		return nil, &apperrors.AppError{
 			Code:    http.StatusNotFound,
 			Message: "User not found",
@@ -37,6 +46,7 @@ func (s *UserService) GetUserByID(ctx context.Context, userID int) (*models.User
 	}
 
 	if err != nil {
+		log.Println("Failed to get user profile:", err)
 		switch {
 		case errors.Is(err, context.DeadlineExceeded):
 			return nil, &apperrors.AppError{
@@ -68,11 +78,13 @@ func (s *UserService) AddRoleToUser(ctx context.Context, id int, req *models.Add
 	if err := s.userRepo.AddUserRole(ctx, id, req.RoleID); err != nil {
 		var pgErr *pq.Error
 		switch {
+
 		case errors.As(err, &pgErr) && pgErr.Code == apperrors.PgErrUniqueViolation:
 			return nil, &apperrors.AppError{
 				Code:    http.StatusConflict,
 				Message: "User already has this role",
 			}
+
 		case errors.As(err, &pgErr) && pgErr.Code == apperrors.PgErrForeignKeyViolation:
 			if strings.Contains(pgErr.Constraint, "user_id") {
 				return nil, &apperrors.AppError{
@@ -81,20 +93,23 @@ func (s *UserService) AddRoleToUser(ctx context.Context, id int, req *models.Add
 				}
 			} else if strings.Contains(pgErr.Constraint, "role_id") {
 				return nil, &apperrors.AppError{
-					Code:    http.StatusNotFound,
-					Message: "Role not found",
+					Code:    http.StatusBadRequest,
+					Message: "Incorrect role id",
 				}
 			}
+
 		case errors.Is(err, context.DeadlineExceeded):
 			return nil, &apperrors.AppError{
 				Code:    http.StatusGatewayTimeout,
 				Message: "Request timeout",
 			}
+
 		case errors.Is(err, context.Canceled):
 			return nil, &apperrors.AppError{
 				Code:    http.StatusBadRequest,
 				Message: "Request cancelled",
 			}
+			
 		default:
 			return nil, &apperrors.AppError{
 				Code:    http.StatusInternalServerError,
