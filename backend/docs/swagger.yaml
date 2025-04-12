@@ -56,6 +56,17 @@ definitions:
       updated_at:
         type: string
     type: object
+  models.HealthStatus:
+    properties:
+      details:
+        additionalProperties:
+          type: string
+        type: object
+      status:
+        type: string
+      timestamp:
+        type: string
+    type: object
   models.UserAuthRequest:
     properties:
       email:
@@ -82,6 +93,60 @@ definitions:
         type: integer
       username:
         type: string
+    type: object
+  models.WorkoutExerciseRequest:
+    properties:
+      exercise_id:
+        type: integer
+      notes:
+        type: string
+      reps:
+        type: integer
+      sets:
+        type: integer
+      weight:
+        type: number
+    type: object
+  models.WorkoutExerciseResponse:
+    properties:
+      created_at:
+        type: string
+      exercise_id:
+        type: integer
+      id:
+        type: integer
+      notes:
+        type: string
+      reps:
+        type: integer
+      sets:
+        type: integer
+      weight:
+        type: number
+      workout_id:
+        type: integer
+    type: object
+  models.WorkoutRequest:
+    properties:
+      date:
+        type: string
+      notes:
+        type: string
+    type: object
+  models.WorkoutResponse:
+    properties:
+      created_at:
+        type: string
+      date:
+        type: string
+      id:
+        type: integer
+      notes:
+        type: string
+      updated_at:
+        type: string
+      user_id:
+        type: integer
     type: object
 info:
   contact:
@@ -566,6 +631,26 @@ paths:
       summary: Update exercise
       tags:
       - exercises
+  /health:
+    get:
+      consumes:
+      - application/json
+      description: Checks the status of the application and its dependencies (database,
+        redis)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Application is working correctly
+          schema:
+            $ref: '#/definitions/models.HealthStatus'
+        "503":
+          description: Server or dependency issues
+          schema:
+            $ref: '#/definitions/models.HealthStatus'
+      summary: Checking the application's functionality
+      tags:
+      - health
   /login:
     post:
       consumes:
@@ -621,43 +706,6 @@ paths:
       summary: User logout
       tags:
       - auth
-  /profile:
-    get:
-      description: Endpoint for get user profile
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: User profile data
-          schema:
-            $ref: '#/definitions/models.UserResponse'
-        "400":
-          description: Request cancelled
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-        "403":
-          description: Forbidden
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-        "404":
-          description: User not found
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-        "500":
-          description: Failed to login user
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-        "504":
-          description: Request timeout
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-      summary: User profile
-      tags:
-      - user
   /register:
     post:
       consumes:
@@ -699,6 +747,12 @@ paths:
   /user/{id}/roles:
     post:
       description: Endpoint for add role to user
+      parameters:
+      - description: User id
+        in: path
+        name: id
+        required: true
+        type: integer
       produces:
       - application/json
       responses:
@@ -707,7 +761,7 @@ paths:
           schema:
             $ref: '#/definitions/models.UserResponse'
         "400":
-          description: Incorrect id
+          description: Incorrect role id
           schema:
             $ref: '#/definitions/models.ErrorResponse'
         "401":
@@ -719,7 +773,7 @@ paths:
           schema:
             $ref: '#/definitions/models.ErrorResponse'
         "404":
-          description: Role not found
+          description: User not found
           schema:
             $ref: '#/definitions/models.ErrorResponse'
         "409":
@@ -737,4 +791,255 @@ paths:
       summary: Add role to user
       tags:
       - user
+  /users/me:
+    get:
+      description: Endpoint for get information about user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User profile data
+          schema:
+            $ref: '#/definitions/models.UserResponse'
+        "400":
+          description: Request cancelled
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: User not found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Failed to login user
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "504":
+          description: Request timeout
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: User profile
+      tags:
+      - user
+  /workouts:
+    get:
+      consumes:
+      - application/json
+      description: Get workouts by user id
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Workouts got successfully
+          schema:
+            items:
+              $ref: '#/definitions/models.WorkoutResponse'
+            type: array
+        "400":
+          description: Request cancelled
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Workouts not found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Failed to get workouts
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "504":
+          description: Request timeout
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Get workouts by user id
+      tags:
+      - workouts
+    post:
+      consumes:
+      - application/json
+      description: Create new workout
+      parameters:
+      - description: Workout data
+        in: body
+        name: workout
+        required: true
+        schema:
+          $ref: '#/definitions/models.WorkoutRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Workout created
+          schema:
+            $ref: '#/definitions/models.WorkoutResponse'
+        "400":
+          description: Request cancelled
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Failed to create workout
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "504":
+          description: Request timeout
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Create workout
+      tags:
+      - workouts
+  /workouts/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get workout by user id
+      parameters:
+      - description: Workout id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Workout got successfully
+          schema:
+            $ref: '#/definitions/models.WorkoutResponse'
+        "400":
+          description: Request cancelled
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Workout not found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Failed to get workout
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "504":
+          description: Request timeout
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Get workout by user id
+      tags:
+      - workouts
+  /workouts/{id}/exercises:
+    get:
+      consumes:
+      - application/json
+      description: Get exercises by workout id
+      parameters:
+      - description: Workout id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Exercise successfully got
+          schema:
+            $ref: '#/definitions/models.WorkoutExerciseResponse'
+        "400":
+          description: Request cancelled
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Failed to add exercise
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "504":
+          description: Request timeout
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Get exercises by workout id
+      tags:
+      - workouts
+    post:
+      consumes:
+      - application/json
+      description: Add exercise to workout
+      parameters:
+      - description: Workout id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Exercise data
+        in: body
+        name: workoutExercise
+        required: true
+        schema:
+          $ref: '#/definitions/models.WorkoutExerciseRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Exercise added to workout
+          schema:
+            $ref: '#/definitions/models.WorkoutExerciseResponse'
+        "400":
+          description: Request cancelled
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Failed to add exercise
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "504":
+          description: Request timeout
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Add exercise to workout
+      tags:
+      - workouts
 swagger: "2.0"
