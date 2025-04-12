@@ -30,7 +30,6 @@ func SetupRoutes(handlers *handlers.Handlers, appmiddlewares *appmiddlewares.App
 		r.Group(func(r chi.Router) {
 			r.Use(appmiddlewares.AppAuthMiddlreware.AuthMiddleware())
 
-			r.Get("/profile", handlers.UserHandler.Profile)
 			r.Post("/logout", handlers.AuthHandler.Logout)
 
 			r.Route("/exercises", func(r chi.Router) {
@@ -60,7 +59,19 @@ func SetupRoutes(handlers *handlers.Handlers, appmiddlewares *appmiddlewares.App
 			})
 
 			r.Route("/users", func(r chi.Router) {
+				r.Get("/me", handlers.UserHandler.GetCurrentUser)
 				r.Post("/{id}/roles", handlers.UserHandler.AddRoleToUser)
+			})
+
+			r.Route("/workouts", func(r chi.Router) {
+				r.Post("/{id}/exercises", handlers.WorkoutExerciseHandler.AddExerciseToWorkout)
+				r.Get("/{id}/exercises", handlers.WorkoutExerciseHandler.GetExercisesByWorkoutID)
+
+				r.Get("/{id}", handlers.WorkoutHandler.GetWorkoutByUserID)
+
+				r.Post("/", handlers.WorkoutHandler.CreateWorkout)
+				r.Get("/", handlers.WorkoutHandler.GetWorkoutsByUserID)
+
 			})
 		})
 	})
