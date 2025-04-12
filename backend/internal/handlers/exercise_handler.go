@@ -242,7 +242,7 @@ func (h *ExerciseHandler) UpdateExercise(w http.ResponseWriter, r *http.Request)
 
 	id, err := strconv.Atoi(idStr)
 	if err != nil || id < 1 {
-		log.Println(err)
+		log.Println("Incorrect id:", err)
 		utils.JSONError(w, "Incorrect id", http.StatusBadRequest)
 		return
 	}

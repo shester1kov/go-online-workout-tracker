@@ -24,9 +24,9 @@ func NewUserHandler(userService *services.UserService) *UserHandler {
 	return &UserHandler{userService: userService}
 }
 
-// Profile godoc
+// GetCurrentUser  godoc
 // @Summary User profile
-// @Description Endpoint for get user profile
+// @Description Endpoint for get information about user
 // @Tags user
 // @Produce json
 // @Success 200 {object} models.UserResponse "User profile data"
@@ -36,18 +36,22 @@ func NewUserHandler(userService *services.UserService) *UserHandler {
 // @Failure 404 {object} models.ErrorResponse "User not found"
 // @Failure 500 {object} models.ErrorResponse "Failed to login user"
 // @Failure 504 {object} models.ErrorResponse "Request timeout"
-// @Router /profile [get]
-func (h *UserHandler) Profile(w http.ResponseWriter, r *http.Request) {
+// @Router /users/me [get]
+func (h *UserHandler) GetCurrentUser(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	userID, ok := ctx.Value("user_id").(int)
-	if !ok {
-		utils.JSONError(w, "Unauthorized", http.StatusUnauthorized)
-		return
-	}
 
-	user, err := h.userService.GetUserByID(ctx, userID)
+	ctx, cancel := context.WithTimeout(ctx, 2*time.Second)
+	defer cancel()
+
+	user, err := h.userService.GetUserByID(ctx)
 	if err != nil {
-		utils.JSONError(w, "User not found", http.StatusNotFound)
+		log.Println("Failed to get user profile:", err)
+		var appErr *apperrors.AppError
+		if errors.As(err, &appErr) {
+			utils.JSONError(w, appErr.Message, appErr.Code)
+			return
+		}
+		utils.JSONError(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
 
@@ -68,13 +72,14 @@ func (h *UserHandler) Profile(w http.ResponseWriter, r *http.Request) {
 // @Description Endpoint for add role to user
 // @Tags user
 // @Produce json
+// @Param id path int true "User id"
 // @Success 200 {object} models.UserResponse "User data"
 // @Failure 400 {object} models.ErrorResponse "Request cancelled"
 // @Failure 400 {object} models.ErrorResponse "Incorrect id"
+// @Failure 400 {object} models.ErrorResponse "Incorrect role id"
 // @Failure 401 {object} models.ErrorResponse "Unauthorized"
 // @Failure 403 {object} models.ErrorResponse "Forbidden"
 // @Failure 404 {object} models.ErrorResponse "User not found"
-// @Failure 404 {object} models.ErrorResponse "Role not found"
 // @Failure 409 {object} models.ErrorResponse "User already has this role"
 // @Failure 500 {object} models.ErrorResponse "Failed to login user"
 // @Failure 504 {object} models.ErrorResponse "Request timeout"
@@ -96,8 +101,8 @@ func (h *UserHandler) AddRoleToUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ctx := r.Context()
-	claims := ctx.Value("user_claims").(*models.Claims)
-	if claims.UserID == id {
+	userID := ctx.Value("user_id").(int)
+	if userID == id {
 		utils.JSONError(w, "You can't change your role", http.StatusForbidden)
 		return
 	}
