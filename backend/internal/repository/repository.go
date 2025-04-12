@@ -1,23 +1,25 @@
 package repository
 
-import (
-	"database/sql"
-)
+import "github.com/jmoiron/sqlx"
 
 type Repositories struct {
-	ExerciseRepo      *ExerciseRepository
-	CategoryRepo      *CategoryRepository
-	UserRepo          *UserRepository
-	RoleRepo          *RoleRepository
-	DBHeathRepository *DBHeathRepository
+	ExerciseRepo        *ExerciseRepository
+	CategoryRepo        *CategoryRepository
+	UserRepo            *UserRepository
+	RoleRepo            *RoleRepository
+	DBHeathRepo         *DBHeathRepository
+	WorkoutRepo         *WorkoutRepository
+	WorkoutExerciseRepo *WorkoutExerciseRepository
 }
 
-func InitRepositories(dbConn *sql.DB) *Repositories {
+func InitRepositories(dbConn *sqlx.DB) *Repositories {
 	return &Repositories{
-		ExerciseRepo:      NewExerciseRepository(dbConn),
-		CategoryRepo:      NewCategoryRepository(dbConn),
-		UserRepo:          NewUserRepository(dbConn),
-		RoleRepo:          NewRoleRepository(dbConn),
-		DBHeathRepository: NewDBHealthRepository(dbConn),
+		ExerciseRepo:        NewExerciseRepository(dbConn),
+		CategoryRepo:        NewCategoryRepository(dbConn),
+		UserRepo:            NewUserRepository(dbConn),
+		RoleRepo:            NewRoleRepository(dbConn),
+		DBHeathRepo:         NewDBHealthRepository(dbConn),
+		WorkoutRepo:         NewWorkoutRepository(dbConn),
+		WorkoutExerciseRepo: NewWorkoutExerciseRepository(dbConn),
 	}
 }

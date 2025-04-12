@@ -3,17 +3,18 @@ package repository
 import (
 	"backend/internal/models"
 	"context"
-	"database/sql"
 	"fmt"
 	"log"
 	"strings"
+
+	"github.com/jmoiron/sqlx"
 )
 
 type ExerciseRepository struct {
-	db *sql.DB
+	db *sqlx.DB
 }
 
-func NewExerciseRepository(db *sql.DB) *ExerciseRepository {
+func NewExerciseRepository(db *sqlx.DB) *ExerciseRepository {
 	return &ExerciseRepository{db: db}
 }
 

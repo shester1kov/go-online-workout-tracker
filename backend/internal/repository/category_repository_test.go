@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/jmoiron/sqlx"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -17,7 +18,9 @@ func TestCreateCategory(t *testing.T) {
 	}
 	defer db.Close()
 
-	repo := NewCategoryRepository(db)
+	sqlxDB := sqlx.NewDb(db, "postgres")
+
+	repo := NewCategoryRepository(sqlxDB)
 
 	mock.ExpectQuery(`INSERT INTO Categories`).
 		WithArgs("Test Category", "test-category", "This is a test category").

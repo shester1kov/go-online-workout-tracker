@@ -3,15 +3,16 @@ package repository
 import (
 	"backend/internal/models"
 	"context"
-	"database/sql"
 	"log"
+
+	"github.com/jmoiron/sqlx"
 )
 
 type UserRepository struct {
-	db *sql.DB
+	db *sqlx.DB
 }
 
-func NewUserRepository(db *sql.DB) *UserRepository {
+func NewUserRepository(db *sqlx.DB) *UserRepository {
 	return &UserRepository{db: db}
 }
 
@@ -89,7 +90,7 @@ func (r *UserRepository) AddUserRole(ctx context.Context, userID, roleID int) er
 }
 
 func (r *UserRepository) GetUserByEmail(ctx context.Context, email string) (*models.User, error) {
-	query := `SELECT id, username, email, password_hash
+	query := `SELECT id, username, email, password_hash, created_at
 	FROM Users
 	WHERE email = $1`
 	user := &models.User{}
@@ -99,6 +100,7 @@ func (r *UserRepository) GetUserByEmail(ctx context.Context, email string) (*mod
 		&user.Username,
 		&user.Email,
 		&user.PasswordHash,
+		&user.CreatedAt,
 	)
 	if err != nil {
 		log.Println("Failed to get user by email:", err)

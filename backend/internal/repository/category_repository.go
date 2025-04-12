@@ -3,15 +3,16 @@ package repository
 import (
 	"backend/internal/models"
 	"context"
-	"database/sql"
 	"log"
+
+	"github.com/jmoiron/sqlx"
 )
 
 type CategoryRepository struct {
-	db *sql.DB
+	db *sqlx.DB
 }
 
-func NewCategoryRepository(db *sql.DB) *CategoryRepository {
+func NewCategoryRepository(db *sqlx.DB) *CategoryRepository {
 	return &CategoryRepository{db: db}
 }
 

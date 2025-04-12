@@ -2,14 +2,15 @@ package repository
 
 import (
 	"context"
-	"database/sql"
+
+	"github.com/jmoiron/sqlx"
 )
 
 type DBHeathRepository struct {
-	db *sql.DB
+	db *sqlx.DB
 }
 
-func NewDBHealthRepository(db *sql.DB) *DBHeathRepository {
+func NewDBHealthRepository(db *sqlx.DB) *DBHeathRepository {
 	return &DBHeathRepository{db: db}
 }
 
