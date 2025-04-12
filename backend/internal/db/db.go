@@ -2,13 +2,13 @@ package db
 
 import (
 	"backend/internal/config"
-	"database/sql"
 	"fmt"
 
+	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 )
 
-func NewConnection(envs *config.Envs) (*sql.DB, error) {
+func NewConnection(envs *config.Envs) (*sqlx.DB, error) {
 	dsn := fmt.Sprintf(
 		"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
 		envs.PostgresHost,
@@ -21,7 +21,7 @@ func NewConnection(envs *config.Envs) (*sql.DB, error) {
 
 	//fmt.Println(dsn)
 
-	db, err := sql.Open("postgres", dsn)
+	db, err := sqlx.Open("postgres", dsn)
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to database: %w", err)
 	}

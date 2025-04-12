@@ -2,7 +2,6 @@ package db
 
 import (
 	"backend/internal/config"
-	"database/sql"
 	"fmt"
 	"log"
 	"path/filepath"
@@ -10,10 +9,11 @@ import (
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
+	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 )
 
-func RunMigrations(db *sql.DB, envs *config.Envs) error {
+func RunMigrations(db *sqlx.DB, envs *config.Envs) error {
 	migrationsPath, err := filepath.Abs("migrations")
 	if err != nil {
 		return fmt.Errorf("abs path get error: %v", err)
@@ -21,7 +21,7 @@ func RunMigrations(db *sql.DB, envs *config.Envs) error {
 	//log.Println(migrationsPath)
 	migrationsPath = filepath.ToSlash(migrationsPath)
 
-	driver, err := postgres.WithInstance(db, &postgres.Config{})
+	driver, err := postgres.WithInstance(db.DB, &postgres.Config{})
 	if err != nil {
 		return err
 	}
