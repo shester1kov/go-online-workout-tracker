@@ -911,6 +911,48 @@ paths:
       tags:
       - workouts
   /workouts/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete workout by user id
+      parameters:
+      - description: Workout id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Workout successfully deleted
+        "400":
+          description: Request cancelled
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Workout not found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Failed to delete workout
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "504":
+          description: Request timeout
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Delete workout by user id
+      tags:
+      - workouts
     get:
       consumes:
       - application/json
@@ -953,6 +995,56 @@ paths:
           schema:
             $ref: '#/definitions/models.ErrorResponse'
       summary: Get workout by user id
+      tags:
+      - workouts
+    put:
+      consumes:
+      - application/json
+      description: Update workout by user id
+      parameters:
+      - description: Workout id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Workout data
+        in: body
+        name: workout
+        required: true
+        schema:
+          $ref: '#/definitions/models.WorkoutRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Workout successfully updated
+          schema:
+            $ref: '#/definitions/models.ExerciseResponse'
+        "400":
+          description: Request cancelled
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Workout not found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Failed to update workout
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "504":
+          description: Request timeout
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Update workout by user id
       tags:
       - workouts
   /workouts/{id}/exercises:
