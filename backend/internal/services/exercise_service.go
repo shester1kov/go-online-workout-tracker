@@ -252,7 +252,7 @@ func (s *ExerciseService) DeleteExercise(ctx context.Context, id int) error {
 			log.Println("Unhandled error:", err)
 			return &apperrors.AppError{
 				Code:    http.StatusInternalServerError,
-				Message: "Failed to get categories",
+				Message: "Failed to delete exercise",
 			}
 		}
 	}

@@ -252,13 +252,13 @@ func (h *ExerciseHandler) UpdateExercise(w http.ResponseWriter, r *http.Request)
 	err = json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
 		log.Println("Invalid request body:", err)
-		utils.JSONError(w, "Invalid request body:", http.StatusBadRequest)
+		utils.JSONError(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
 
 	if len(strings.TrimSpace(req.Name)) < 2 {
 		log.Println("Invalid request body:", err)
-		utils.JSONError(w, "Invalid request body:", http.StatusBadRequest)
+		utils.JSONError(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
 
