@@ -86,14 +86,6 @@ func (s *WorkoutSerivce) GetWorkoutsByUserID(ctx context.Context) (*[]models.Wor
 	}
 
 	workouts, err := s.workoutRepo.GetWorkoutsByUserID(ctx, userID)
-	if workouts == nil || len(*workouts) == 0 {
-		log.Println("Workouts not found")
-		return nil, &apperrors.AppError{
-			Code:    http.StatusNotFound,
-			Message: "Workouts not found",
-		}
-	}
-
 	if err != nil {
 		switch {
 		case errors.Is(err, context.Canceled):
@@ -119,6 +111,14 @@ func (s *WorkoutSerivce) GetWorkoutsByUserID(ctx context.Context) (*[]models.Wor
 		}
 	}
 
+	if workouts == nil || len(*workouts) == 0 {
+		log.Println("Workouts not found")
+		return nil, &apperrors.AppError{
+			Code:    http.StatusNotFound,
+			Message: "Workouts not found",
+		}
+	}
+
 	return workouts, nil
 }
 
@@ -133,14 +133,6 @@ func (s *WorkoutSerivce) GetWorkoutByUserID(ctx context.Context, workoutID int) 
 	}
 
 	workout, err := s.workoutRepo.GetWorkoutByUserID(ctx, userID, workoutID)
-	if workout == nil {
-		log.Println("Workout not found")
-		return nil, &apperrors.AppError{
-			Code:    http.StatusNotFound,
-			Message: "Workout not found",
-		}
-	}
-
 	if err != nil {
 		switch {
 		case errors.Is(err, context.Canceled):
@@ -173,5 +165,120 @@ func (s *WorkoutSerivce) GetWorkoutByUserID(ctx context.Context, workoutID int) 
 		}
 	}
 
+	if workout == nil {
+		log.Println("Workout not found")
+		return nil, &apperrors.AppError{
+			Code:    http.StatusNotFound,
+			Message: "Workout not found",
+		}
+	}
+
 	return workout, nil
+}
+
+func (s *WorkoutSerivce) UpdateWorkoutByUserID(ctx context.Context, workoutID int, req *models.WorkoutRequest) (*models.Workout, error) {
+	userID, ok := ctx.Value("user_id").(int)
+	if !ok {
+		return nil, &apperrors.AppError{
+			Code:    http.StatusUnauthorized,
+			Message: "Missing userID in context",
+		}
+	}
+
+	workout := &models.Workout{
+		ID:     workoutID,
+		UserID: userID,
+		Date:   req.Date,
+		Notes:  req.Notes,
+	}
+
+	err := s.workoutRepo.UpdateWorkoutByUserID(ctx, workout)
+	if err != nil {
+		var pgErr *pq.Error
+		switch {
+		case errors.Is(err, context.Canceled):
+			log.Println("Request cancelled:", err)
+			return nil, &apperrors.AppError{
+				Code:    http.StatusBadRequest,
+				Message: "Request cancelled",
+			}
+
+		case errors.Is(err, context.DeadlineExceeded):
+			log.Println("Deadline exceeded:", err)
+			return nil, &apperrors.AppError{
+				Code:    http.StatusGatewayTimeout,
+				Message: "Request timeout",
+			}
+
+		case errors.Is(err, sql.ErrNoRows):
+			log.Println("Workout not found:", err)
+			return nil, &apperrors.AppError{
+				Code:    http.StatusNotFound,
+				Message: "Workout not found",
+			}
+
+		case errors.As(err, &pgErr) && pgErr.Code == apperrors.PgErrForeignKeyViolation:
+			log.Println("Foreign key violation:", pgErr)
+			return nil, &apperrors.AppError{
+				Code:    http.StatusBadRequest,
+				Message: "Incorrect user id",
+			}
+
+		default:
+			log.Println("Unhandled error:", err)
+			return nil, &apperrors.AppError{
+				Code:    http.StatusInternalServerError,
+				Message: "Failed to update workout",
+			}
+		}
+	}
+
+	return workout, nil
+}
+
+func (s *WorkoutSerivce) DeleteWorkoutByUserID(ctx context.Context, id int) error {
+	userID, ok := ctx.Value("user_id").(int)
+	if !ok {
+		return &apperrors.AppError{
+			Code:    http.StatusUnauthorized,
+			Message: "Missing userID in context",
+		}
+	}
+
+	rowsAffected, err := s.workoutRepo.DeleteWorkoutByUserID(ctx, id, userID)
+
+	if err != nil {
+		switch {
+		case errors.Is(err, context.Canceled):
+			log.Println("Request cancelled:", err)
+			return &apperrors.AppError{
+				Code:    http.StatusBadRequest,
+				Message: "Request cancelled",
+			}
+
+		case errors.Is(err, context.DeadlineExceeded):
+			log.Println("Deadline exceeded:", err)
+			return &apperrors.AppError{
+				Code:    http.StatusGatewayTimeout,
+				Message: "Request timeout",
+			}
+
+		default:
+			log.Println("Unhandled error:", err)
+			return &apperrors.AppError{
+				Code:    http.StatusInternalServerError,
+				Message: "Failed to delete exercise",
+			}
+		}
+	}
+
+	if rowsAffected == 0 {
+		log.Println("Exercise not found")
+		return &apperrors.AppError{
+			Code:    http.StatusNotFound,
+			Message: "Workout not found",
+		}
+	}
+
+	return nil
 }

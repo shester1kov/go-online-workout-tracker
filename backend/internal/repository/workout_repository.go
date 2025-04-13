@@ -114,3 +114,55 @@ func (r *WorkoutRepository) GetWorkoutByUserID(ctx context.Context, userID int, 
 
 	return &workout, nil
 }
+
+func (r *WorkoutRepository) UpdateWorkoutByUserID(ctx context.Context, workout *models.Workout) error {
+	query := `UPDATE Workouts 
+	SET date = $1, notes = $2, updated_at = NOW()
+	WHERE id = $3
+	AND is_active = TRUE
+	AND user_id = $4
+	RETURNING created_at, updated_at, is_active`
+
+	err := r.db.QueryRowContext(
+		ctx,
+		query,
+		workout.Date,
+		workout.Notes,
+		workout.ID,
+		workout.UserID,
+	).Scan(
+		&workout.CreatedAt,
+		&workout.UpdatedAt,
+		&workout.IsActive,
+	)
+
+	if err != nil {
+		log.Println("Failed to create workout:", err)
+		return err
+	}
+
+	return nil
+}
+
+func (r *WorkoutRepository) DeleteWorkoutByUserID(ctx context.Context, id, userID int) (int, error) {
+
+	query := `UPDATE Workouts
+	SET is_active = FALSE, updated_at = NOW()
+	WHERE id = $1
+	AND user_id = $2
+	AND is_active = TRUE`
+
+	result, err := r.db.ExecContext(ctx, query, id, userID)
+	if err != nil {
+		log.Println("Failed to workout exercise", err)
+		return 0, err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		log.Println("Failed to delete workout result", err)
+		return 0, err
+	}
+
+	return int(rowsAffected), nil
+}

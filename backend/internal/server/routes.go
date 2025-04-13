@@ -68,6 +68,8 @@ func SetupRoutes(handlers *handlers.Handlers, appmiddlewares *appmiddlewares.App
 				r.Get("/{id}/exercises", handlers.WorkoutExerciseHandler.GetExercisesByWorkoutID)
 
 				r.Get("/{id}", handlers.WorkoutHandler.GetWorkoutByUserID)
+				r.Put("/{id}", handlers.WorkoutHandler.UpdateWorkoutByUserID)
+				r.Delete("/{id}", handlers.WorkoutHandler.DeleteWorkoutByUserID)
 
 				r.Post("/", handlers.WorkoutHandler.CreateWorkout)
 				r.Get("/", handlers.WorkoutHandler.GetWorkoutsByUserID)

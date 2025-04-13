@@ -185,3 +185,119 @@ func (h *WorkoutHandler) GetWorkoutByUserID(w http.ResponseWriter, r *http.Reque
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(response)
 }
+
+// UpdateWorkoutByUserID godoc
+// @Summary Update workout by user id
+// @Description Update workout by user id
+// @Tags workouts
+// @Accept json
+// @Produce json
+// @Param id path int true "Workout id"
+// @Param workout body models.WorkoutRequest true "Workout data"
+// @Success 200 {object} models.ExerciseResponse "Workout successfully updated"
+// @Failure 400 {object} models.ErrorResponse "Invalid id"
+// @Failure 400 {object} models.ErrorResponse "Invalid request body"
+// @Failure 400 {object} models.ErrorResponse "Invalid user id"
+// @Failure 400 {object} models.ErrorResponse "Request cancelled"
+// @Failure 401 {object} models.ErrorResponse "Unauthorized"
+// @Failure 403 {object} models.ErrorResponse "Forbidden"
+// @Failure 404 {object} models.ErrorResponse "Workout not found"
+// @Failure 500 {object} models.ErrorResponse "Failed to update workout"
+// @Failure 504 {object} models.ErrorResponse "Request timeout"
+// @Router /workouts/{id} [put]
+func (h *WorkoutHandler) UpdateWorkoutByUserID(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
+	idStr := chi.URLParam(r, "id")
+
+	id, err := strconv.Atoi(idStr)
+	if err != nil || id < 1 {
+		log.Println("Incorrect id:", err)
+		utils.JSONError(w, "Incorrect id", http.StatusBadRequest)
+		return
+	}
+
+	var req models.WorkoutRequest
+
+	err = json.NewDecoder(r.Body).Decode(&req)
+	if err != nil {
+		log.Println("Invalid request body:", err)
+		utils.JSONError(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+
+	workout, err := h.workoutSerivce.UpdateWorkoutByUserID(ctx, id, &req)
+	if err != nil {
+		log.Println("Failed to update exercise:", err)
+		var appErr *apperrors.AppError
+		if errors.As(err, &appErr) {
+			utils.JSONError(w, appErr.Message, appErr.Code)
+			return
+		}
+		utils.JSONError(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+
+	response := models.WorkoutResponse{
+		ID:        workout.ID,
+		UserID:    workout.UserID,
+		Date:      workout.Date,
+		Notes:     workout.Notes,
+		CreatedAt: workout.CreatedAt,
+		UpdatedAt: workout.UpdatedAt,
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(response)
+}
+
+// DeleteWorkoutByUserID godoc
+// @Summary Delete workout by user id
+// @Description Delete workout by user id
+// @Tags workouts
+// @Accept json
+// @Produce json
+// @Param id path int true "Workout id"
+// @Success 204 "Workout successfully deleted"
+// @Failure 400 {object} models.ErrorResponse "Invalid id"
+// @Failure 400 {object} models.ErrorResponse "Request cancelled"
+// @Failure 401 {object} models.ErrorResponse "Unauthorized"
+// @Failure 403 {object} models.ErrorResponse "Forbidden"
+// @Failure 404 {object} models.ErrorResponse "Workout not found"
+// @Failure 500 {object} models.ErrorResponse "Failed to delete workout"
+// @Failure 504 {object} models.ErrorResponse "Request timeout"
+// @Router /workouts/{id} [delete]
+func (h *WorkoutHandler) DeleteWorkoutByUserID(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
+	idStr := chi.URLParam(r, "id")
+
+	id, err := strconv.Atoi(idStr)
+	if err != nil || id < 1 {
+		log.Println(err)
+		utils.JSONError(w, "Incorrect id", http.StatusBadRequest)
+		return
+	}
+
+	err = h.workoutSerivce.DeleteWorkoutByUserID(ctx, id)
+
+	if err != nil {
+		log.Println("Failed to delete exercise:", err)
+		var appErr *apperrors.AppError
+		if errors.As(err, &appErr) {
+			utils.JSONError(w, appErr.Message, appErr.Code)
+			return
+		}
+		utils.JSONError(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}
