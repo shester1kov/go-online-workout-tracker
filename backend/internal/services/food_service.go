@@ -108,6 +108,13 @@ func (s *FoodService) GetFoodByDate(ctx context.Context, date string) (*[]models
 		}
 	}
 
+	if foods == nil || len(*foods) == 0 {
+		return nil, &apperrors.AppError{
+			Code:    http.StatusNotFound,
+			Message: "Foods not found",
+		}
+	}
+
 	return foods, nil
 }
 
