@@ -75,6 +75,11 @@ func SetupRoutes(handlers *handlers.Handlers, appmiddlewares *appmiddlewares.App
 				r.Get("/", handlers.WorkoutHandler.GetWorkoutsByUserID)
 
 			})
+
+			r.Route("/foods", func(r chi.Router) {
+				r.Get("/{date}", handlers.FoodHandler.GetFood)
+				r.Post("/", handlers.FoodHandler.AddFood)
+			})
 		})
 	})
 

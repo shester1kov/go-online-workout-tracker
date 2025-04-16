@@ -2,6 +2,7 @@ package services
 
 import (
 	"backend/internal/auth"
+	"backend/internal/clients"
 	"backend/internal/repository"
 
 	"github.com/redis/go-redis/v9"
@@ -15,9 +16,10 @@ type Services struct {
 	HealthService          *HealthService
 	WorkoutSerivce         *WorkoutSerivce
 	WorkoutExerciseSerivce *WorkoutExerciseSerivce
+	FoodService            *FoodService
 }
 
-func InitServices(repos *repository.Repositories, redis *redis.Client, jwtManager *auth.JWTManager) *Services {
+func InitServices(repos *repository.Repositories, redis *redis.Client, jwtManager *auth.JWTManager, clients *clients.Clients) *Services {
 	return &Services{
 		ExerciseService:        NewExerciseService(repos.ExerciseRepo, repos.CategoryRepo, redis),
 		CategoryService:        NewCategoryService(repos.CategoryRepo, redis),
@@ -26,5 +28,6 @@ func InitServices(repos *repository.Repositories, redis *redis.Client, jwtManage
 		HealthService:          NewHealthService(repos.DBHeathRepo, redis),
 		WorkoutSerivce:         NewWorkoutService(repos.WorkoutRepo),
 		WorkoutExerciseSerivce: NewWorkoutExerciseService(repos.WorkoutRepo, repos.WorkoutExerciseRepo, repos.ExerciseRepo),
+		FoodService:            NewFoodService(clients.NutritionixClient, repos.FoodRepository),
 	}
 }

@@ -10,6 +10,7 @@ type Repositories struct {
 	DBHeathRepo         *DBHeathRepository
 	WorkoutRepo         *WorkoutRepository
 	WorkoutExerciseRepo *WorkoutExerciseRepository
+	FoodRepository      *FoodRepository
 }
 
 func InitRepositories(dbConn *sqlx.DB) *Repositories {
@@ -21,5 +22,6 @@ func InitRepositories(dbConn *sqlx.DB) *Repositories {
 		DBHeathRepo:         NewDBHealthRepository(dbConn),
 		WorkoutRepo:         NewWorkoutRepository(dbConn),
 		WorkoutExerciseRepo: NewWorkoutExerciseRepository(dbConn),
+		FoodRepository:      NewFoodRepository(dbConn),
 	}
 }

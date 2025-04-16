@@ -3,6 +3,7 @@ package main
 import (
 	"backend/internal/appmiddlewares"
 	"backend/internal/auth"
+	"backend/internal/clients"
 	"backend/internal/config"
 	"backend/internal/db"
 	"backend/internal/handlers"
@@ -44,7 +45,8 @@ func main() {
 
 	repos := repository.InitRepositories(dbConn)
 	jwtManager := auth.InitJWTManager(envs)
-	service := services.InitServices(repos, redisClient, jwtManager)
+	clients := clients.InitClients(envs)
+	service := services.InitServices(repos, redisClient, jwtManager, clients)
 	handler := handlers.InitHandlers(service)
 	appmiddleware := appmiddlewares.InitAppMiddlewares(jwtManager, service, envs)
 

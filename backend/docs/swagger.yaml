@@ -56,6 +56,56 @@ definitions:
       updated_at:
         type: string
     type: object
+  models.FoodRequest:
+    properties:
+      date:
+        type: string
+      items:
+        items:
+          $ref: '#/definitions/models.FoodRequestItem'
+        type: array
+    type: object
+  models.FoodRequestItem:
+    properties:
+      product_name:
+        type: string
+      quantity:
+        type: number
+      unit:
+        type: string
+    type: object
+  models.FoodResponse:
+    properties:
+      date:
+        type: string
+      items:
+        items:
+          $ref: '#/definitions/models.FoodResponseItem'
+        type: array
+      user_id:
+        type: integer
+    type: object
+  models.FoodResponseItem:
+    properties:
+      calories:
+        type: number
+      carbohydrate:
+        type: number
+      fat:
+        type: number
+      id:
+        type: integer
+      name:
+        type: string
+      protein:
+        type: number
+      quantity:
+        type: number
+      unit:
+        type: string
+      weight_grams:
+        type: number
+    type: object
   models.HealthStatus:
     properties:
       details:
@@ -631,6 +681,97 @@ paths:
       summary: Update exercise
       tags:
       - exercises
+  /foods:
+    post:
+      consumes:
+      - application/json
+      description: Add user daily food
+      parameters:
+      - description: Food description
+        in: body
+        name: description
+        required: true
+        schema:
+          $ref: '#/definitions/models.FoodRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: List of foods
+          schema:
+            items:
+              $ref: '#/definitions/models.FoodResponse'
+            type: array
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "504":
+          description: Request timeout
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Add food
+      tags:
+      - foods
+  /foods/{date}:
+    get:
+      consumes:
+      - application/json
+      description: Get user daily food
+      parameters:
+      - description: Date
+        in: path
+        name: date
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of foods
+          schema:
+            items:
+              $ref: '#/definitions/models.FoodResponse'
+            type: array
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "504":
+          description: Request timeout
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Get food
+      tags:
+      - foods
   /health:
     get:
       consumes:
@@ -744,7 +885,7 @@ paths:
       summary: User registration
       tags:
       - auth
-  /user/{id}/roles:
+  /users/{id}/roles:
     post:
       description: Endpoint for add role to user
       parameters:
