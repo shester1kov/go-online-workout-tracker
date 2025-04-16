@@ -83,7 +83,7 @@ func (h *UserHandler) GetCurrentUser(w http.ResponseWriter, r *http.Request) {
 // @Failure 409 {object} models.ErrorResponse "User already has this role"
 // @Failure 500 {object} models.ErrorResponse "Failed to login user"
 // @Failure 504 {object} models.ErrorResponse "Request timeout"
-// @Router /user/{id}/roles [post]
+// @Router /users/{id}/roles [post]
 func (h *UserHandler) AddRoleToUser(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "id")
 
