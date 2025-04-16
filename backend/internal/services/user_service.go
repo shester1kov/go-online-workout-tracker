@@ -37,13 +37,6 @@ func (s *UserService) GetUserByID(ctx context.Context) (*models.User, error) {
 	}
 
 	user, err := s.userRepo.GetUserByID(ctx, userID)
-	if user == nil {
-		log.Println("User not found")
-		return nil, &apperrors.AppError{
-			Code:    http.StatusNotFound,
-			Message: "User not found",
-		}
-	}
 
 	if err != nil {
 		log.Println("Failed to get user profile:", err)
@@ -70,6 +63,15 @@ func (s *UserService) GetUserByID(ctx context.Context) (*models.User, error) {
 			}
 		}
 	}
+
+	if user == nil {
+		log.Println("User not found")
+		return nil, &apperrors.AppError{
+			Code:    http.StatusNotFound,
+			Message: "User not found",
+		}
+	}
+
 	return user, nil
 }
 
@@ -109,7 +111,7 @@ func (s *UserService) AddRoleToUser(ctx context.Context, id int, req *models.Add
 				Code:    http.StatusBadRequest,
 				Message: "Request cancelled",
 			}
-			
+
 		default:
 			return nil, &apperrors.AppError{
 				Code:    http.StatusInternalServerError,
