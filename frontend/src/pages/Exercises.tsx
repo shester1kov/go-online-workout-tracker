@@ -13,7 +13,7 @@ export default function Exercises() {
                 Упражнения
             </h1>
             <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-                {exercises.map(exercise => (
+                {exercises?.exercises.map(exercise => (
                     <ExerciseCard key={exercise.id} exercise={exercise} />
                 ))}
             </div>

@@ -7,6 +7,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Exercises from "./pages/Exercises";
 import Profile from "./pages/Profile";
+import Workouts from "./pages/Workouts";
 import { useAuth } from "./hooks/useAuth";
 
 export default function App() {
@@ -33,7 +34,7 @@ export default function App() {
             path='/login'
             element={user ? <Navigate to='/' /> : <Login />}
           />
-                    <Route
+          <Route
             path='/register'
             element={user ? <Navigate to='/' /> : <Register />}
           />
@@ -44,6 +45,10 @@ export default function App() {
           <Route
             path='/profile'
             element={user ? <Profile /> : <Navigate to='/login' />} 
+          />
+          <Route
+            path='/workouts'
+            element={user ? <Workouts /> : <Navigate to='/login' />} 
           />
           </Routes>
 

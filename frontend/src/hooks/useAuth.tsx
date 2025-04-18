@@ -17,7 +17,7 @@ export function useAuth() {
 
     const checkAuth = async () => {
         try {
-            const response = await fetch('http://localhost:8080/api/v1/profile', {
+            const response = await fetch('http://localhost:8080/api/v1/users/me', {
                 credentials: 'include'
             })
 

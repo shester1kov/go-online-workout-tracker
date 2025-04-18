@@ -6,3 +6,10 @@ export interface Exercise {
     created_at: string,
     updated_at: string,
 }
+
+export interface ExerciseList {
+    exercises: Exercise[],
+    total: number,
+    page: number,
+    limit: number,
+}

@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "./useAuth";
-import { Exercise } from "../models/exercise";
+import { ExerciseList } from "../models/exercise";
 
 export function useExercises() {
     const { user } = useAuth()
-    const [exercises, setExercises] = useState<Exercise[]>([])
+    const [exercises, setExercises] = useState<ExerciseList>()
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
 

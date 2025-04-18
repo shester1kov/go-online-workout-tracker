@@ -48,6 +48,19 @@ export default function Header() {
                     >
                         Упражнения
                     </NavLink>
+                    <NavLink 
+                        to='/workouts'
+                        className={
+                            ({ isActive }) =>
+                                `px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 ease-in-out ${
+                                    isActive
+                                        ? 'bg-blue-500 text-white'
+                                        : 'text-gray-700 hover:bg-blue-100 hover:translate-y-[-2px] hover:shadow-sm'
+                                }`
+                        }
+                    >
+                        Тренировки
+                    </NavLink>
                 </nav>
 
                 {user ? (
