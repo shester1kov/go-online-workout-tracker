@@ -1192,7 +1192,7 @@ paths:
     get:
       consumes:
       - application/json
-      description: Get exercises by workout id
+      description: Get all exercises by workout id
       parameters:
       - description: Workout id
         in: path
@@ -1203,9 +1203,11 @@ paths:
       - application/json
       responses:
         "200":
-          description: Exercise successfully got
+          description: Exercises successfully got
           schema:
-            $ref: '#/definitions/models.WorkoutExerciseResponse'
+            items:
+              $ref: '#/definitions/models.WorkoutExerciseResponse'
+            type: array
         "400":
           description: Request cancelled
           schema:
@@ -1218,15 +1220,19 @@ paths:
           description: Forbidden
           schema:
             $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Exercises not found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
         "500":
-          description: Failed to add exercise
+          description: Failed to get exercises
           schema:
             $ref: '#/definitions/models.ErrorResponse'
         "504":
           description: Request timeout
           schema:
             $ref: '#/definitions/models.ErrorResponse'
-      summary: Get exercises by workout id
+      summary: Get all exercises by workout id
       tags:
       - workouts
     post:
@@ -1273,6 +1279,160 @@ paths:
           schema:
             $ref: '#/definitions/models.ErrorResponse'
       summary: Add exercise to workout
+      tags:
+      - workouts
+  /workouts/{id}/exercises/{workoutExerciseID}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete exercises by workout id
+      parameters:
+      - description: Workout id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Workout exercise id
+        in: path
+        name: workoutExerciseID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Exercise successfully deleted
+          schema:
+            $ref: '#/definitions/models.WorkoutExerciseResponse'
+        "400":
+          description: Request cancelled
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Exercise not found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Failed to add exercise
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "504":
+          description: Request timeout
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Delete exercise by workout id
+      tags:
+      - workouts
+    get:
+      consumes:
+      - application/json
+      description: Get exercises by workout id
+      parameters:
+      - description: Workout id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Workout exercise id
+        in: path
+        name: workoutExerciseID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Exercise successfully got
+          schema:
+            $ref: '#/definitions/models.WorkoutExerciseResponse'
+        "400":
+          description: Request cancelled
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Exercise not found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Failed to get exercise
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "504":
+          description: Request timeout
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Get exercise by workout id
+      tags:
+      - workouts
+    put:
+      consumes:
+      - application/json
+      description: Update exercise in workout
+      parameters:
+      - description: Workout id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Workout exercise id
+        in: path
+        name: workoutExerciseID
+        required: true
+        type: integer
+      - description: Exercise data
+        in: body
+        name: workoutExercise
+        required: true
+        schema:
+          $ref: '#/definitions/models.WorkoutExerciseRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Exercise updated successfully
+          schema:
+            $ref: '#/definitions/models.WorkoutExerciseResponse'
+        "400":
+          description: Request cancelled
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Exercise not found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Failed to update exercise
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "504":
+          description: Request timeout
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Update exercise in workout
       tags:
       - workouts
 swagger: "2.0"

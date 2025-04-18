@@ -1501,7 +1501,7 @@ const docTemplate = `{
         },
         "/workouts/{id}/exercises": {
             "get": {
-                "description": "Get exercises by workout id",
+                "description": "Get all exercises by workout id",
                 "consumes": [
                     "application/json"
                 ],
@@ -1511,7 +1511,7 @@ const docTemplate = `{
                 "tags": [
                     "workouts"
                 ],
-                "summary": "Get exercises by workout id",
+                "summary": "Get all exercises by workout id",
                 "parameters": [
                     {
                         "type": "integer",
@@ -1523,9 +1523,12 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "Exercise successfully got",
+                        "description": "Exercises successfully got",
                         "schema": {
-                            "$ref": "#/definitions/models.WorkoutExerciseResponse"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.WorkoutExerciseResponse"
+                            }
                         }
                     },
                     "400": {
@@ -1546,8 +1549,14 @@ const docTemplate = `{
                             "$ref": "#/definitions/models.ErrorResponse"
                         }
                     },
+                    "404": {
+                        "description": "Exercises not found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
                     "500": {
-                        "description": "Failed to add exercise",
+                        "description": "Failed to get exercises",
                         "schema": {
                             "$ref": "#/definitions/models.ErrorResponse"
                         }
@@ -1611,6 +1620,236 @@ const docTemplate = `{
                     },
                     "403": {
                         "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to add exercise",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "504": {
+                        "description": "Request timeout",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/workouts/{id}/exercises/{workoutExerciseID}": {
+            "get": {
+                "description": "Get exercises by workout id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "workouts"
+                ],
+                "summary": "Get exercise by workout id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Workout id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Workout exercise id",
+                        "name": "workoutExerciseID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Exercise successfully got",
+                        "schema": {
+                            "$ref": "#/definitions/models.WorkoutExerciseResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Request cancelled",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Exercise not found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to get exercise",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "504": {
+                        "description": "Request timeout",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Update exercise in workout",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "workouts"
+                ],
+                "summary": "Update exercise in workout",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Workout id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Workout exercise id",
+                        "name": "workoutExerciseID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Exercise data",
+                        "name": "workoutExercise",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.WorkoutExerciseRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Exercise updated successfully",
+                        "schema": {
+                            "$ref": "#/definitions/models.WorkoutExerciseResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Request cancelled",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Exercise not found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to update exercise",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "504": {
+                        "description": "Request timeout",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete exercises by workout id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "workouts"
+                ],
+                "summary": "Delete exercise by workout id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Workout id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Workout exercise id",
+                        "name": "workoutExerciseID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Exercise successfully deleted",
+                        "schema": {
+                            "$ref": "#/definitions/models.WorkoutExerciseResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Request cancelled",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Exercise not found",
                         "schema": {
                             "$ref": "#/definitions/models.ErrorResponse"
                         }

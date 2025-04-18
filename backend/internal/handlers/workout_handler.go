@@ -48,6 +48,7 @@ func (h *WorkoutHandler) CreateWorkout(w http.ResponseWriter, r *http.Request) {
 	var request models.WorkoutRequest
 	err := json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
+		log.Println("Invalid input:", err)
 		utils.JSONError(w, "Invalid input", http.StatusBadRequest)
 		return
 	}
