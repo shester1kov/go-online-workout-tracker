@@ -147,6 +147,7 @@ func (h *WorkoutExerciseHandler) GetExercisesByWorkoutID(w http.ResponseWriter, 
 			Weight:     workoutExercise.Weight,
 			Notes:      workoutExercise.Notes,
 			CreatedAt:  workoutExercise.CreatedAt,
+			Exercise:   workoutExercise.Exercise,
 		}
 
 		response = append(response, workoutExerciseResponse)
@@ -219,6 +220,7 @@ func (h *WorkoutExerciseHandler) GetExerciseByWorkoutID(w http.ResponseWriter, r
 		Weight:     workoutExercise.Weight,
 		Notes:      workoutExercise.Notes,
 		CreatedAt:  workoutExercise.CreatedAt,
+		Exercise:   workoutExercise.Exercise,
 	}
 
 	w.Header().Set("Content-Type", "application/json")

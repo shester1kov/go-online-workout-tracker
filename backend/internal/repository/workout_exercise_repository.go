@@ -44,9 +44,11 @@ func (r *WorkoutExerciseRepository) AddExerciseToWorkout(ctx context.Context, wo
 }
 
 func (r *WorkoutExerciseRepository) GetExercisesByWorkoutID(ctx context.Context, workoutID int) (*[]models.WorkoutExercise, error) {
-	query := `SELECT id, workout_id, exercise_id, sets, reps, weight, notes, created_at
-	FROM workoutExercises
-	WHERE workout_id = $1`
+	query := `SELECT we.id, we.workout_id, we.exercise_id, we.sets, we.reps, we.weight, we.notes, we.created_at,
+	e.id, e.name, e.description
+	FROM WorkoutExercises we
+	INNER JOIN Exercises e ON we.exercise_id = e.id
+	WHERE we.workout_id = $1`
 
 	rows, err := r.db.QueryContext(
 		ctx,
@@ -61,7 +63,10 @@ func (r *WorkoutExerciseRepository) GetExercisesByWorkoutID(ctx context.Context,
 
 	var exercises []models.WorkoutExercise
 	for rows.Next() {
+
 		var workoutExercise models.WorkoutExercise
+		var exercise models.WorkoutExerciseItem
+
 		err := rows.Scan(
 			&workoutExercise.ID,
 			&workoutExercise.WorkoutID,
@@ -71,10 +76,17 @@ func (r *WorkoutExerciseRepository) GetExercisesByWorkoutID(ctx context.Context,
 			&workoutExercise.Weight,
 			&workoutExercise.Notes,
 			&workoutExercise.CreatedAt,
+			&exercise.ID,
+			&exercise.Name,
+			&exercise.Description,
 		)
 		if err != nil {
 			log.Println("Failed to scan workout exercise:", err)
 			return nil, err
+		}
+
+		if exercise.ID != 0 {
+			workoutExercise.Exercise = &exercise
 		}
 
 		exercises = append(exercises, workoutExercise)
@@ -89,12 +101,15 @@ func (r *WorkoutExerciseRepository) GetExercisesByWorkoutID(ctx context.Context,
 }
 
 func (r *WorkoutExerciseRepository) GetExerciseByWorkoutID(ctx context.Context, workoutID, workoutExerciseID int) (*models.WorkoutExercise, error) {
-	query := `SELECT id, workout_id, exercise_id, sets, reps, weight, notes, created_at
-	FROM workoutExercises
-	WHERE workout_id = $1
-	AND id = $2`
+	query := `SELECT we.id, we.workout_id, we.exercise_id, we.sets, we.reps, we.weight, we.notes, we.created_at,
+	e.id, e.name, e.description
+	FROM WorkoutExercises we
+	INNER JOIN Exercises e ON we.exercise_id = e.id
+	WHERE we.workout_id = $1
+	AND we.id = $2`
 
 	var workoutExercise models.WorkoutExercise
+	var exercise models.WorkoutExerciseItem
 
 	err := r.db.QueryRowContext(
 		ctx,
@@ -110,10 +125,17 @@ func (r *WorkoutExerciseRepository) GetExerciseByWorkoutID(ctx context.Context, 
 		&workoutExercise.Weight,
 		&workoutExercise.Notes,
 		&workoutExercise.CreatedAt,
+		&exercise.ID,
+		&exercise.Name,
+		&exercise.Description,
 	)
 	if err != nil {
 		log.Println("Failed to scan workout exercise:", err)
 		return nil, err
+	}
+
+	if exercise.ID != 0 {
+		workoutExercise.Exercise = &exercise
 	}
 
 	return &workoutExercise, nil

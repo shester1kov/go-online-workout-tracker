@@ -1824,11 +1824,8 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "Exercise successfully deleted",
-                        "schema": {
-                            "$ref": "#/definitions/models.WorkoutExerciseResponse"
-                        }
+                    "204": {
+                        "description": "Exercise successfully deleted"
                     },
                     "400": {
                         "description": "Request cancelled",
@@ -2093,6 +2090,20 @@ const docTemplate = `{
                 }
             }
         },
+        "models.WorkoutExerciseItem": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
         "models.WorkoutExerciseRequest": {
             "type": "object",
             "properties": {
@@ -2118,6 +2129,9 @@ const docTemplate = `{
             "properties": {
                 "created_at": {
                     "type": "string"
+                },
+                "exercise": {
+                    "$ref": "#/definitions/models.WorkoutExerciseItem"
                 },
                 "exercise_id": {
                     "type": "integer"

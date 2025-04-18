@@ -144,6 +144,15 @@ definitions:
       username:
         type: string
     type: object
+  models.WorkoutExerciseItem:
+    properties:
+      description:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
   models.WorkoutExerciseRequest:
     properties:
       exercise_id:
@@ -161,6 +170,8 @@ definitions:
     properties:
       created_at:
         type: string
+      exercise:
+        $ref: '#/definitions/models.WorkoutExerciseItem'
       exercise_id:
         type: integer
       id:
@@ -1300,10 +1311,8 @@ paths:
       produces:
       - application/json
       responses:
-        "200":
+        "204":
           description: Exercise successfully deleted
-          schema:
-            $ref: '#/definitions/models.WorkoutExerciseResponse'
         "400":
           description: Request cancelled
           schema:
