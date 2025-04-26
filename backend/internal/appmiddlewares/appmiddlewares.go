@@ -29,7 +29,7 @@ func InitAppMiddlewares(jwtManager *auth.JWTManager, services *services.Services
 			},
 			true,
 			300,
-			true,
+			false,
 		),
 	}
 }

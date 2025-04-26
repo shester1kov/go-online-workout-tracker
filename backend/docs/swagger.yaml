@@ -117,6 +117,25 @@ definitions:
       timestamp:
         type: string
     type: object
+  models.NutritionEntry:
+    properties:
+      calories:
+        type: number
+      carbs:
+        type: number
+      date:
+        type: string
+      fat:
+        type: number
+      food_name:
+        type: string
+      id:
+        type: integer
+      protein:
+        type: number
+      user_id:
+        type: integer
+    type: object
   models.UserAuthRequest:
     properties:
       email:
@@ -440,6 +459,23 @@ paths:
       summary: Update category
       tags:
       - categories
+  /connect/fatsecret:
+    get:
+      description: Starts the OAuth 1.0 authentication process with FatSecret API
+      produces:
+      - application/json
+      responses:
+        "302":
+          description: Redirect to FatSecret authorization page
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Initiate FatSecret OAuth flow
+      tags:
+      - fatsecretauthentication
   /exercises:
     get:
       consumes:
@@ -858,6 +894,60 @@ paths:
       summary: User logout
       tags:
       - auth
+  /nutrition:
+    get:
+      description: Returns nutrition data for the specified date
+      parameters:
+      - description: Date in YYYY-MM-DD format
+        in: query
+        name: date
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.NutritionEntry'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Get daily nutrition entries
+      tags:
+      - nutrition
+  /oauth/fatsecret/callback:
+    get:
+      description: Handles the callback from FatSecret after user authorization
+      parameters:
+      - description: OAuth token
+        in: query
+        name: oauth_token
+        required: true
+        type: string
+      - description: OAuth verifier
+        in: query
+        name: oauth_verifier
+        required: true
+        type: string
+      responses:
+        "302":
+          description: Redirect to profile page with success flag
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: FatSecret OAuth callback handler
+      tags:
+      - fatsecretauthentication
   /register:
     post:
       consumes:

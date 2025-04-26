@@ -346,6 +346,32 @@
                 }
             }
         },
+        "/connect/fatsecret": {
+            "get": {
+                "description": "Starts the OAuth 1.0 authentication process with FatSecret API",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "fatsecretauthentication"
+                ],
+                "summary": "Initiate FatSecret OAuth flow",
+                "responses": {
+                    "302": {
+                        "description": "Redirect to FatSecret authorization page",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/exercises": {
             "get": {
                 "description": "Get all exercises from the database with optional filters and pagination",
@@ -970,6 +996,88 @@
                     },
                     "403": {
                         "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/nutrition": {
+            "get": {
+                "description": "Returns nutrition data for the specified date",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "nutrition"
+                ],
+                "summary": "Get daily nutrition entries",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Date in YYYY-MM-DD format",
+                        "name": "date",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.NutritionEntry"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/oauth/fatsecret/callback": {
+            "get": {
+                "description": "Handles the callback from FatSecret after user authorization",
+                "tags": [
+                    "fatsecretauthentication"
+                ],
+                "summary": "FatSecret OAuth callback handler",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "OAuth token",
+                        "name": "oauth_token",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "OAuth verifier",
+                        "name": "oauth_verifier",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "302": {
+                        "description": "Redirect to profile page with success flag",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/models.ErrorResponse"
                         }
@@ -2038,6 +2146,35 @@
                 },
                 "timestamp": {
                     "type": "string"
+                }
+            }
+        },
+        "models.NutritionEntry": {
+            "type": "object",
+            "properties": {
+                "calories": {
+                    "type": "number"
+                },
+                "carbs": {
+                    "type": "number"
+                },
+                "date": {
+                    "type": "string"
+                },
+                "fat": {
+                    "type": "number"
+                },
+                "food_name": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "protein": {
+                    "type": "number"
+                },
+                "user_id": {
+                    "type": "integer"
                 }
             }
         },

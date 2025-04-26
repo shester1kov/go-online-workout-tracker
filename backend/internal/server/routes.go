@@ -27,10 +27,17 @@ func SetupRoutes(handlers *handlers.Handlers, appmiddlewares *appmiddlewares.App
 		r.Post("/login", handlers.AuthHandler.Login)
 		r.Get("/swagger/*", httpSwagger.WrapHandler)
 
+		r.Route("/oauth/fatsecret", func(r chi.Router) {
+			r.Get("/callback", handlers.FatSecretAuthHandler.Callback)
+		})
+
 		r.Group(func(r chi.Router) {
 			r.Use(appmiddlewares.AppAuthMiddlreware.AuthMiddleware())
 
 			r.Post("/logout", handlers.AuthHandler.Logout)
+
+			r.Get("/nutrition", handlers.NutritionHandler.GetDailyNutrition)
+			r.Get("/connect/fatsecret", handlers.FatSecretAuthHandler.ConnectFatSecret)
 
 			r.Route("/exercises", func(r chi.Router) {
 				r.Get("/{id}", handlers.ExerciseHandler.GetExercise)

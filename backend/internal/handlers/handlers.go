@@ -11,6 +11,8 @@ type Handlers struct {
 	WorkoutHandler         *WorkoutHandler
 	WorkoutExerciseHandler *WorkoutExerciseHandler
 	FoodHandler            *FoodHandler
+	NutritionHandler       *NutritionHandler
+	FatSecretAuthHandler   *FatSecretAuthHandler
 }
 
 func InitHandlers(services *services.Services) *Handlers {
@@ -23,5 +25,7 @@ func InitHandlers(services *services.Services) *Handlers {
 		WorkoutHandler:         NewWorkoutHandler(services.WorkoutSerivce),
 		WorkoutExerciseHandler: NewWorkoutExerciseHandler(services.WorkoutExerciseSerivce),
 		FoodHandler:            NewFoodHandler(services.FoodService),
+		NutritionHandler:       NewNutritionHandler(services.NutritionService),
+		FatSecretAuthHandler:   NewFatSecretAuthHandler(services.NutritionService),
 	}
 }
