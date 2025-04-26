@@ -13,7 +13,7 @@ export default function Exercises() {
                 Упражнения
             </h1>
             <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-                {exercises?.exercises.map(exercise => (
+                {exercises.map(exercise => (
                     <ExerciseCard key={exercise.id} exercise={exercise} />
                 ))}
             </div>
@@ -21,7 +21,7 @@ export default function Exercises() {
     )
 }
 
-function ExerciseCard({ exercise }: {exercise: Exercise }) {
+function ExerciseCard({ exercise }: { exercise: Exercise }) {
     return (
         <div className="bg-white rounded-lg shadow p-4">
             <h2 className="font-bold text-lg">

@@ -18,6 +18,11 @@ export function useWorkouts() {
                 credentials: "include",
             });
 
+            if (response.status === 404) {
+                setWorkouts([]);
+                return
+            }
+
             if (!response.ok) {
                 throw new Error("Ошибка при загрузке тренировок")
             }
