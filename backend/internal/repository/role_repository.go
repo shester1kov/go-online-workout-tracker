@@ -3,6 +3,7 @@ package repository
 import (
 	"backend/internal/models"
 	"context"
+	"log"
 
 	"github.com/jmoiron/sqlx"
 )
@@ -27,6 +28,11 @@ func (r *RoleRepository) GetRoleByID(ctx context.Context, roleID int) (*models.R
 		&role.Name,
 		&role.Description,
 	)
+
+	if err != nil {
+		log.Println("Failed to get role by ID:", err)
+		return nil, err
+	}
 	return role, err
 
 }

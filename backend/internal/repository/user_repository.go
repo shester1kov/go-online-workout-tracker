@@ -218,13 +218,13 @@ func (r *UserRepository) GetUserRoles(ctx context.Context, userID int) (*[]model
 
 	for rows.Next() {
 		var role models.Role
-		rows.Scan(
+		err := rows.Scan(
 			&role.ID,
 			&role.Name,
 			&role.Description,
 		)
-		if rows.Err() != nil {
-			log.Println("Failed to get user roles row:", err)
+		if err != nil {
+			log.Println("Failed to scan user role:", err)
 			return nil, err
 		}
 
@@ -232,7 +232,7 @@ func (r *UserRepository) GetUserRoles(ctx context.Context, userID int) (*[]model
 	}
 
 	if rows.Err() != nil {
-		log.Println("Failed to get user roles row:", err)
+		log.Println("Rows iteration error:", err)
 		return nil, err
 	}
 
