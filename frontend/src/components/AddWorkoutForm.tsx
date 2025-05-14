@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { API_URL } from "../config";
 //import { Workout } from "../models/workouts";
 
 export function AddWorkoutForm({ onSuccess }: { onSuccess: () => void }) {
@@ -13,7 +14,7 @@ export function AddWorkoutForm({ onSuccess }: { onSuccess: () => void }) {
         try {
             const dateISO = date ? `${date}T00:00:00.000Z` : null
 
-            const response = await fetch("http://localhost:8080/api/v1/workouts", {
+            const response = await fetch(`${API_URL}/workouts`, {
                 method: "POST",
                 credentials: "include",
                 headers: { "Content-Type": "application/json" },

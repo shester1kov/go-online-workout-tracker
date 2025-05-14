@@ -34,7 +34,7 @@ func NewUserHandler(userService *services.UserService) *UserHandler {
 // @Failure 401 {object} models.ErrorResponse "Unauthorized"
 // @Failure 403 {object} models.ErrorResponse "Forbidden"
 // @Failure 404 {object} models.ErrorResponse "User not found"
-// @Failure 500 {object} models.ErrorResponse "Failed to login user"
+// @Failure 500 {object} models.ErrorResponse "Failed to get user profile"
 // @Failure 504 {object} models.ErrorResponse "Request timeout"
 // @Router /users/me [get]
 func (h *UserHandler) GetCurrentUser(w http.ResponseWriter, r *http.Request) {
@@ -73,7 +73,7 @@ func (h *UserHandler) GetCurrentUser(w http.ResponseWriter, r *http.Request) {
 // @Tags user
 // @Produce json
 // @Param id path int true "User id"
-// @Success 200 {object} models.UserResponse "User data"
+// @Success 201 {object} models.UserResponse "User data"
 // @Failure 400 {object} models.ErrorResponse "Request cancelled"
 // @Failure 400 {object} models.ErrorResponse "Incorrect id"
 // @Failure 400 {object} models.ErrorResponse "Incorrect role id"
@@ -81,7 +81,7 @@ func (h *UserHandler) GetCurrentUser(w http.ResponseWriter, r *http.Request) {
 // @Failure 403 {object} models.ErrorResponse "Forbidden"
 // @Failure 404 {object} models.ErrorResponse "User not found"
 // @Failure 409 {object} models.ErrorResponse "User already has this role"
-// @Failure 500 {object} models.ErrorResponse "Failed to login user"
+// @Failure 500 {object} models.ErrorResponse "Failed to get user roles"
 // @Failure 504 {object} models.ErrorResponse "Request timeout"
 // @Router /users/{id}/roles [post]
 func (h *UserHandler) AddRoleToUser(w http.ResponseWriter, r *http.Request) {
@@ -130,6 +130,53 @@ func (h *UserHandler) AddRoleToUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
+	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(response)
+}
+
+// Get user roles godoc
+// @Summary Get user roles
+// @Description Endpoint for get user roles
+// @Tags user
+// @Produce json
+// @Param id path int true "User id"
+// @Success 200 {object} models.UserResponse "User roles data"
+// @Failure 400 {object} models.ErrorResponse "Request cancelled"
+// @Failure 400 {object} models.ErrorResponse "Incorrect id"
+// @Failure 400 {object} models.ErrorResponse "Incorrect role id"
+// @Failure 401 {object} models.ErrorResponse "Unauthorized"
+// @Failure 403 {object} models.ErrorResponse "Forbidden"
+// @Failure 404 {object} models.ErrorResponse "User roles not found"
+// @Failure 500 {object} models.ErrorResponse "Failed to login user"
+// @Failure 504 {object} models.ErrorResponse "Request timeout"
+// @Router /users/{id}/roles [get]
+func (h *UserHandler) GetUserRoles(w http.ResponseWriter, r *http.Request) {
+	idStr := chi.URLParam(r, "id")
+
+	id, err := strconv.Atoi(idStr)
+	if err != nil || id < 1 {
+		log.Println("Incorrect id:", err)
+		utils.JSONError(w, "Incorrect id", http.StatusBadRequest)
+		return
+	}
+
+	ctx := r.Context()
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
+	roles, err := h.userService.GetUserRoles(ctx, id)
+	if err != nil {
+		log.Println("Failed to get user roles:", err)
+		var appErr *apperrors.AppError
+		if errors.As(err, &appErr) {
+			utils.JSONError(w, appErr.Message, appErr.Code)
+			return
+		}
+		utils.JSONError(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(roles)
 }

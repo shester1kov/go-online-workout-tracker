@@ -11,10 +11,11 @@ import (
 
 type FatSecretAuthHandler struct {
 	nutritionService *services.NutritionService
+	frontendUrl      string
 }
 
-func NewFatSecretAuthHandler(nutritionService *services.NutritionService) *FatSecretAuthHandler {
-	return &FatSecretAuthHandler{nutritionService: nutritionService}
+func NewFatSecretAuthHandler(nutritionService *services.NutritionService, frontendUrl string) *FatSecretAuthHandler {
+	return &FatSecretAuthHandler{nutritionService: nutritionService, frontendUrl: frontendUrl}
 }
 
 // ConnectFatSecret initiates FatSecret OAuth authentication
@@ -60,5 +61,5 @@ func (h *FatSecretAuthHandler) Callback(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	http.Redirect(w, r, "http://localhost:5173/profile", http.StatusFound)
+	http.Redirect(w, r, h.frontendUrl+"/profile", http.StatusFound)
 }

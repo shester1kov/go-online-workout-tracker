@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { User } from "../models/user";
+import { API_URL } from "../config";
 
 
 
@@ -17,7 +18,7 @@ export function useAuth() {
 
     const checkAuth = async () => {
         try {
-            const response = await fetch('http://localhost:8080/api/v1/users/me', {
+            const response = await fetch(`${API_URL}/users/me`, {
                 credentials: 'include'
             })
 
@@ -37,7 +38,7 @@ export function useAuth() {
 
     const login = async (email: string, password: string) => {
         try {
-            const response = await fetch('http://localhost:8080/api/v1/login', {
+            const response = await fetch(`${API_URL}/login`, {
                 method: 'POST',
                 credentials: 'include',
                 headers: {
@@ -58,7 +59,7 @@ export function useAuth() {
 
     const logout = async () => {
         try {
-            await fetch('http://localhost:8080/api/v1/logout', {
+            await fetch(`${API_URL}/logout`, {
                 method: 'POST',
                 credentials: 'include',
             })
@@ -71,7 +72,7 @@ export function useAuth() {
 
     const register = async (email: string, password: string, username: string) => {
         try {
-            const response = await fetch('http://localhost:8080/api/v1/register', {
+            const response = await fetch(`${API_URL}/register`, {
                 method: 'POST',
                 credentials: 'include',
                 headers: {

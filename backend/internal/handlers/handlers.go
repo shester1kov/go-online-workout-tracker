@@ -1,6 +1,9 @@
 package handlers
 
-import "backend/internal/services"
+import (
+	"backend/internal/config"
+	"backend/internal/services"
+)
 
 type Handlers struct {
 	ExerciseHandler        *ExerciseHandler
@@ -15,7 +18,7 @@ type Handlers struct {
 	FatSecretAuthHandler   *FatSecretAuthHandler
 }
 
-func InitHandlers(services *services.Services) *Handlers {
+func InitHandlers(services *services.Services, envs *config.Envs) *Handlers {
 	return &Handlers{
 		ExerciseHandler:        NewExerciseHandler(services.ExerciseService),
 		CategoryHandler:        NewCategoryHandler(services.CategoryService),
@@ -26,6 +29,6 @@ func InitHandlers(services *services.Services) *Handlers {
 		WorkoutExerciseHandler: NewWorkoutExerciseHandler(services.WorkoutExerciseSerivce),
 		FoodHandler:            NewFoodHandler(services.FoodService),
 		NutritionHandler:       NewNutritionHandler(services.NutritionService),
-		FatSecretAuthHandler:   NewFatSecretAuthHandler(services.NutritionService),
+		FatSecretAuthHandler:   NewFatSecretAuthHandler(services.NutritionService, envs.FrontendUrl),
 	}
 }

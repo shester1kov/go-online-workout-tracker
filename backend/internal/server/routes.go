@@ -36,8 +36,11 @@ func SetupRoutes(handlers *handlers.Handlers, appmiddlewares *appmiddlewares.App
 
 			r.Post("/logout", handlers.AuthHandler.Logout)
 
-			r.Get("/nutrition", handlers.NutritionHandler.GetDailyNutrition)
 			r.Get("/connect/fatsecret", handlers.FatSecretAuthHandler.ConnectFatSecret)
+
+			r.Route("/nutritions", func(r chi.Router) {
+				r.Get("/{date}", handlers.NutritionHandler.GetDailyNutrition)
+			})
 
 			r.Route("/exercises", func(r chi.Router) {
 				r.Get("/{id}", handlers.ExerciseHandler.GetExercise)
@@ -68,6 +71,7 @@ func SetupRoutes(handlers *handlers.Handlers, appmiddlewares *appmiddlewares.App
 			r.Route("/users", func(r chi.Router) {
 				r.Get("/me", handlers.UserHandler.GetCurrentUser)
 				r.Post("/{id}/roles", handlers.UserHandler.AddRoleToUser)
+				r.Get("/{id}/roles", handlers.UserHandler.GetUserRoles)
 			})
 
 			r.Route("/workouts", func(r chi.Router) {

@@ -1010,7 +1010,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/nutrition": {
+        "/nutritions": {
             "get": {
                 "description": "Returns nutrition data for the specified date",
                 "produces": [
@@ -1025,7 +1025,7 @@ const docTemplate = `{
                         "type": "string",
                         "description": "Date in YYYY-MM-DD format",
                         "name": "date",
-                        "in": "query"
+                        "in": "path"
                     }
                 ],
                 "responses": {
@@ -1192,7 +1192,7 @@ const docTemplate = `{
                         }
                     },
                     "500": {
-                        "description": "Failed to login user",
+                        "description": "Failed to get user profile",
                         "schema": {
                             "$ref": "#/definitions/models.ErrorResponse"
                         }
@@ -1207,6 +1207,69 @@ const docTemplate = `{
             }
         },
         "/users/{id}/roles": {
+            "get": {
+                "description": "Endpoint for get user roles",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Get user roles",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "User id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User roles data",
+                        "schema": {
+                            "$ref": "#/definitions/models.UserResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Incorrect role id",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "User not found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to login user",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "504": {
+                        "description": "Request timeout",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            },
             "post": {
                 "description": "Endpoint for add role to user",
                 "produces": [
@@ -1226,7 +1289,7 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "200": {
+                    "201": {
                         "description": "User data",
                         "schema": {
                             "$ref": "#/definitions/models.UserResponse"
@@ -1263,7 +1326,7 @@ const docTemplate = `{
                         }
                     },
                     "500": {
-                        "description": "Failed to login user",
+                        "description": "Failed to get user roles",
                         "schema": {
                             "$ref": "#/definitions/models.ErrorResponse"
                         }

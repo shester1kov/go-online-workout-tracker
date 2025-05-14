@@ -115,16 +115,19 @@ func (c *FatSecretAuthClient) GetAccessToken(requestToken, requestSecret, verifi
 	return values.Get("oauth_token"), values.Get("oauth_token_secret"), nil
 }
 
-func (c *FatSecretAuthClient) GetFoodEntries(ctx context.Context, accessToken, accessSecret, date string) ([]models.NutritionResponse, error) {
+func (c *FatSecretAuthClient) GetFoodEntries(ctx context.Context, accessToken, accessSecret string, date time.Time) ([]models.NutritionResponse, error) {
+	unixDays := strconv.Itoa(int(date.Unix() / (60 * 60 * 24)))
 
 	baseURL := "https://platform.fatsecret.com/rest/food-entries/v2"
 
 	queryParams := url.Values{}
 	queryParams.Add("format", "json")
+	queryParams.Add("date", unixDays)
 	reqURL := baseURL + "?" + queryParams.Encode()
 
 	oauthParams := map[string]string{
 		"format":                 "json",
+		"date":                   unixDays,
 		"oauth_consumer_key":     c.consumerKey,
 		"oauth_token":            accessToken,
 		"oauth_signature_method": "HMAC-SHA1",

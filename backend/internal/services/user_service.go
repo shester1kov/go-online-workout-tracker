@@ -125,9 +125,29 @@ func (s *UserService) AddRoleToUser(ctx context.Context, id int, req *models.Add
 
 func (s *UserService) GetUserRoles(ctx context.Context, userID int) (*[]models.Role, error) {
 	roles, err := s.userRepo.GetUserRoles(ctx, userID)
+
 	if err != nil {
 		log.Println("Failed to get user roles:", err)
-		return nil, err
+		switch {
+		case errors.Is(err, context.DeadlineExceeded):
+			return nil, &apperrors.AppError{
+				Code:    http.StatusGatewayTimeout,
+				Message: "Request timeout",
+			}
+
+		case errors.Is(err, context.Canceled):
+			return nil, &apperrors.AppError{
+				Code:    http.StatusBadRequest,
+				Message: "Request cancelled",
+			}
+		default:
+			return nil, &apperrors.AppError{
+				Code:    http.StatusInternalServerError,
+				Message: "Failed to add role",
+			}
+
+		}
+
 	}
 	return roles, nil
 }

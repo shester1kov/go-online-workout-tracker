@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { WorkoutExercise } from "../models/workoutExercise";
 import { Workout } from "../models/workouts";
+import { API_URL } from "../config";
 
 export function useWorkoutDetails(workoutID: number) {
     const [workout, setWorkout] = useState<Workout | null>(null);
@@ -11,7 +12,7 @@ export function useWorkoutDetails(workoutID: number) {
     const fetchExercises = async () => {
         try {
             const response = await fetch(
-                `http://localhost:8080/api/v1/workouts/${workoutID}/exercises`, {
+                `${API_URL}/workouts/${workoutID}/exercises`, {
                     method: 'GET',
                     credentials: 'include',
                 }
@@ -37,7 +38,7 @@ export function useWorkoutDetails(workoutID: number) {
                 setError(null);
 
                 const workoutResponse = await fetch(
-                    `http://localhost:8080/api/v1/workouts/${workoutID}`, {
+                    `${API_URL}/workouts/${workoutID}`, {
                         method: "GET",
                         credentials: 'include'
                     }

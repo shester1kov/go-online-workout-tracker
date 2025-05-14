@@ -49,7 +49,7 @@ func main() {
 	clients := clients.InitClients(envs)
 	oauth := oauth.InitOauth(envs)
 	service := services.InitServices(repos, redisClient, jwtManager, clients, oauth)
-	handler := handlers.InitHandlers(service)
+	handler := handlers.InitHandlers(service, envs)
 	appmiddleware := appmiddlewares.InitAppMiddlewares(jwtManager, service, envs)
 
 	router := server.SetupRoutes(handler, appmiddleware)

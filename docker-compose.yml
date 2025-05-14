@@ -50,22 +50,22 @@ services:
       dockerfile: Dockerfile
     environment:
       PORT: ${PORT}
-      POSTGRES_HOST: ${POSTGRES_HOST}
+      POSTGRES_HOST: ${POSTGRES_HOST_DOCKER}
       POSTGRES_PORT: ${POSTGRES_PORT}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_SSLMODE: ${POSTGRES_SSLMODE}
-      REDIS_HOST: ${REDIS_HOST}
+      REDIS_HOST: ${REDIS_HOST_DOCKER}
       REDIS_PORT: ${REDIS_PORT}
       REDIS_PASSWORD: ${REDIS_PASSWORD}
       JWT_SECURE_KEY: ${JWT_SECURE_KEY}
-      FRONTEND_URL: ${FRONTEND_URL}
+      FRONTEND_URL: ${FRONTEND_URL_DOCKER}
       NUTRITIONIX_APP_ID:  ${NUTRITIONIX_APP_ID}
       NUTRITIONIX_APP_KEY:  ${NUTRITIONIX_APP_KEY}
       FATSECRET_CONSUMER_KEY:  ${FATSECRET_CONSUMER_KEY}
       FATSECRET_CONSUMER_SECRET:  ${FATSECRET_CONSUMER_SECRET}
-      FATSECRET_CALLBACK_URL:  ${FATSECRET_CALLBACK_URL}
+      FATSECRET_CALLBACK_URL:  ${FATSECRET_CALLBACK_URL_DOCKER}
       ENV: docker
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:${PORT}/api/v1/health"]
@@ -87,22 +87,22 @@ services:
       dockerfile: Dockerfile
     environment:
       PORT: ${PORT2}
-      POSTGRES_HOST: ${POSTGRES_HOST}
+      POSTGRES_HOST: ${POSTGRES_HOST_DOCKER}
       POSTGRES_PORT: ${POSTGRES_PORT}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_SSLMODE: ${POSTGRES_SSLMODE}
-      REDIS_HOST: ${REDIS_HOST}
+      REDIS_HOST: ${REDIS_HOST_DOCKER}
       REDIS_PORT: ${REDIS_PORT}
       REDIS_PASSWORD: ${REDIS_PASSWORD}
       JWT_SECURE_KEY: ${JWT_SECURE_KEY}
-      FRONTEND_URL: ${FRONTEND_URL}
+      FRONTEND_URL: ${FRONTEND_URL_DOCKER}
       NUTRITIONIX_APP_ID:  ${NUTRITIONIX_APP_ID}
       NUTRITIONIX_APP_KEY:  ${NUTRITIONIX_APP_KEY}
       FATSECRET_CONSUMER_KEY:  ${FATSECRET_CONSUMER_KEY}
       FATSECRET_CONSUMER_SECRET:  ${FATSECRET_CONSUMER_SECRET}
-      FATSECRET_CALLBACK_URL:  ${FATSECRET_CALLBACK_URL}
+      FATSECRET_CALLBACK_URL:  ${FATSECRET_CALLBACK_URL_DOCKER}
       ENV: docker
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:${PORT2}/api/v1/health"]
@@ -124,22 +124,22 @@ services:
       dockerfile: Dockerfile
     environment:
       PORT: ${PORT3}
-      POSTGRES_HOST: ${POSTGRES_HOST}
+      POSTGRES_HOST: ${POSTGRES_HOST_DOCKER}
       POSTGRES_PORT: ${POSTGRES_PORT}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_SSLMODE: ${POSTGRES_SSLMODE}
-      REDIS_HOST: ${REDIS_HOST}
+      REDIS_HOST: ${REDIS_HOST_DOCKER}
       REDIS_PORT: ${REDIS_PORT}
       REDIS_PASSWORD: ${REDIS_PASSWORD}
       JWT_SECURE_KEY: ${JWT_SECURE_KEY}
-      FRONTEND_URL: ${FRONTEND_URL}
+      FRONTEND_URL: ${FRONTEND_URL_DOCKER}
       NUTRITIONIX_APP_ID:  ${NUTRITIONIX_APP_ID}
       NUTRITIONIX_APP_KEY:  ${NUTRITIONIX_APP_KEY}
       FATSECRET_CONSUMER_KEY:  ${FATSECRET_CONSUMER_KEY}
       FATSECRET_CONSUMER_SECRET:  ${FATSECRET_CONSUMER_SECRET}
-      FATSECRET_CALLBACK_URL:  ${FATSECRET_CALLBACK_URL}
+      FATSECRET_CALLBACK_URL:  ${FATSECRET_CALLBACK_URL_DOCKER}
       ENV: docker
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:${PORT3}/api/v1/health"]
@@ -153,6 +153,17 @@ services:
         condition: service_healthy
     networks:
       - backend_net
+  
+  frontend-builder:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: ${VITE_API_URL}
+    volumes:
+      - frontend_dist:/app/dist
+    networks:
+      - backend_net
 
   nginx:
     image: nginx:1.27.4-alpine
@@ -161,6 +172,7 @@ services:
       - "80:80"
       - "443:443"
     volumes:
+      - frontend_dist:/usr/share/nginx/html
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
       - ./nginx/conf.d/:/etc/nginx/conf.d
       - ./nginx/logs:/var/log/nginx
@@ -171,6 +183,8 @@ services:
         condition: service_healthy
       backend3:
         condition: service_healthy
+      frontend-builder:
+        condition: service_started
     networks:
       - backend_net
 
@@ -191,6 +205,7 @@ services:
 volumes:
   postgres_data: {}
   redis_data: {}
+  frontend_dist: {}
 
 networks:
   backend_net:

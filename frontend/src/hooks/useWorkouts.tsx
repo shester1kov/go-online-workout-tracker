@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "./useAuth";
 import { Workout } from "../models/workouts";
+import { API_URL } from "../config";
 
 export function useWorkouts() {
     const { user } = useAuth();
@@ -13,7 +14,7 @@ export function useWorkouts() {
             setLoading(true);
             setError(null);
 
-            const response = await fetch("http://localhost:8080/api/v1/workouts", {
+            const response = await fetch(`${API_URL}/workouts`, {
                 method: "GET",
                 credentials: "include",
             });
@@ -38,7 +39,7 @@ export function useWorkouts() {
 
     const updateWorkout = async (id: number, data: { date: string; notes: string }) => {
         try {
-            const response = await fetch(`http://localhost:8080/api/v1/workouts/${id}`, {
+            const response = await fetch(`${API_URL}/workouts/${id}`, {
                 method: "PUT",
                 credentials: "include",
                 headers: { "Content-Type": "application/json" },
@@ -61,7 +62,7 @@ export function useWorkouts() {
 
     const deleteWorkout = async (id: number) => {
         try {
-            const response = await fetch(`http://localhost:8080/api/v1/workouts/${id}`, {
+            const response = await fetch(`${API_URL}/workouts/${id}`, {
                 method: "DELETE",
                 credentials: "include",
             });

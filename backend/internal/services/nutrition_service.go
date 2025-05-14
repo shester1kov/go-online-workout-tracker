@@ -1,11 +1,13 @@
 package services
 
 import (
+	"backend/internal/apperrors"
 	"backend/internal/models"
 	"backend/internal/oauth"
 	"backend/internal/repository"
 	"context"
 	"log"
+	"net/http"
 	"time"
 )
 
@@ -33,7 +35,7 @@ func (s *NutritionService) GetDailyNutrition(ctx context.Context, date time.Time
 	}
 
 	// client := clients.NewFatSecretClient(auth.AccessToken, auth.AccessSecret, s.fatSecretAuthClient)
-	fsEntries, err := s.fatSecretAuthClient.GetFoodEntries(ctx, auth.AccessToken, auth.AccessSecret, date.Format("2006-01-02"))
+	fsEntries, err := s.fatSecretAuthClient.GetFoodEntries(ctx, auth.AccessToken, auth.AccessSecret, date)
 	if err != nil {
 		return nil, err
 	}
@@ -41,7 +43,7 @@ func (s *NutritionService) GetDailyNutrition(ctx context.Context, date time.Time
 	var entries []models.NutritionEntry
 
 	for _, fsEntry := range fsEntries {
-		entry := &models.NutritionEntry{
+		entry := models.NutritionEntry{
 			UserID:   userID,
 			FoodName: fsEntry.FoodName,
 			Calories: fsEntry.Calories,
@@ -51,7 +53,15 @@ func (s *NutritionService) GetDailyNutrition(ctx context.Context, date time.Time
 			Date:     date,
 		}
 
-		entries = append(entries, *entry)
+		entries = append(entries, entry)
+	}
+
+	if len(entries) == 0 {
+		log.Println("No food entries found for the date:", date.Format("2006-01-02"))
+		return nil, &apperrors.AppError{
+			Code:    http.StatusNotFound,
+			Message: "Нет записей о еде на эту дату",
+		}
 	}
 
 	return &entries, nil

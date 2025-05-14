@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { API_URL } from '../config';
 
 export default function FatSecretButton() {
   const [loading, setLoading] = useState(false);
@@ -36,7 +37,7 @@ export default function FatSecretButton() {
         throw new Error('jQuery не загружен');
       }
 
-      window.open("http://localhost:8080/api/v1/connect/fatsecret", "_blank");
+      window.open(`${API_URL}/connect/fatsecret`, "_blank");
     } catch  {
       setError('Ошибка при открытии окна авторизации');
     } finally {

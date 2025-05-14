@@ -894,12 +894,12 @@ paths:
       summary: User logout
       tags:
       - auth
-  /nutrition:
+  /nutritions:
     get:
       description: Returns nutrition data for the specified date
       parameters:
       - description: Date in YYYY-MM-DD format
-        in: query
+        in: path
         name: date
         type: string
       produces:
@@ -987,6 +987,48 @@ paths:
       tags:
       - auth
   /users/{id}/roles:
+    get:
+      description: Endpoint for get user roles
+      parameters:
+      - description: User id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User roles data
+          schema:
+            $ref: '#/definitions/models.UserResponse'
+        "400":
+          description: Incorrect role id
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: User not found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Failed to login user
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "504":
+          description: Request timeout
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Get user roles
+      tags:
+      - user
     post:
       description: Endpoint for add role to user
       parameters:
@@ -998,7 +1040,7 @@ paths:
       produces:
       - application/json
       responses:
-        "200":
+        "201":
           description: User data
           schema:
             $ref: '#/definitions/models.UserResponse'
@@ -1023,7 +1065,7 @@ paths:
           schema:
             $ref: '#/definitions/models.ErrorResponse'
         "500":
-          description: Failed to login user
+          description: Failed to get user roles
           schema:
             $ref: '#/definitions/models.ErrorResponse'
         "504":
@@ -1060,7 +1102,7 @@ paths:
           schema:
             $ref: '#/definitions/models.ErrorResponse'
         "500":
-          description: Failed to login user
+          description: Failed to get user profile
           schema:
             $ref: '#/definitions/models.ErrorResponse'
         "504":

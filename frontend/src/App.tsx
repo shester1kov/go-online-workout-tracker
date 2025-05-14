@@ -10,6 +10,7 @@ import Profile from "./pages/Profile";
 import Workouts from "./pages/Workouts";
 import { useAuth } from "./hooks/useAuth";
 import WorkoutDetails from "./pages/WorkoutDetails";
+import Nutrition from "./pages/Nutrition";
 
 export default function App() {
   const { user, loading } = useAuth()
@@ -54,6 +55,10 @@ export default function App() {
           <Route
             path='/workouts/:id'
             element={user ? <WorkoutDetails /> : <Navigate to='/login' />}
+          />
+          <Route
+            path='/nutritions'
+            element={user ? <Nutrition /> : <Navigate to='/login' />}
           />
         </Routes>
 
