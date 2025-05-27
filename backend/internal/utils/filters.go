@@ -34,7 +34,7 @@ func ParseExerciseFilter(r *http.Request) *models.ExerciseFilter {
 	}
 
 	if v := q.Get("limit"); v != "" {
-		if l, err := strconv.Atoi(v); err == nil && l > 0 && l < maxLimit {
+		if l, err := strconv.Atoi(v); err == nil && l > 0 && l <= maxLimit {
 			f.Limit = l
 		}
 	}

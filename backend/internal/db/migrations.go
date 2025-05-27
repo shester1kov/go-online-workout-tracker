@@ -18,7 +18,7 @@ func RunMigrations(db *sqlx.DB, envs *config.Envs) error {
 	if err != nil {
 		return fmt.Errorf("abs path get error: %v", err)
 	}
-	//log.Println(migrationsPath)
+
 	migrationsPath = filepath.ToSlash(migrationsPath)
 
 	driver, err := postgres.WithInstance(db.DB, &postgres.Config{})
@@ -34,7 +34,6 @@ func RunMigrations(db *sqlx.DB, envs *config.Envs) error {
 	if err != nil {
 		return err
 	}
-	//defer m.Close()
 
 	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
 		log.Println("migration failed", err)

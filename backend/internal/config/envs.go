@@ -1,7 +1,6 @@
 package config
 
 import (
-	"log"
 	"os"
 
 	"github.com/joho/godotenv"
@@ -27,12 +26,12 @@ type Envs struct {
 	FatsecretCallbackURL    string
 }
 
-func LoadEnvs() *Envs {
+func LoadEnvs(path string) (*Envs, error) {
 	env := os.Getenv("ENV")
 	if env != "docker" {
-		err := godotenv.Load("../.env")
+		err := godotenv.Load(path)
 		if err != nil {
-			log.Fatal("Error loading .env file")
+			return nil, err
 		}
 	}
 
@@ -54,5 +53,5 @@ func LoadEnvs() *Envs {
 		FatsecretConsumerKey:    os.Getenv("FATSECRET_CONSUMER_KEY"),
 		FatsecretConsumerSecret: os.Getenv("FATSECRET_CONSUMER_SECRET"),
 		FatsecretCallbackURL:    os.Getenv("FATSECRET_CALLBACK_URL"),
-	}
+	}, nil
 }

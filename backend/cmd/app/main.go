@@ -26,7 +26,10 @@ import (
 // @license.name MIT
 // @license.url https://opensource.org/licenses/MIT
 func main() {
-	envs := config.LoadEnvs()
+	envs, err := config.LoadEnvs("../.env")
+	if err != nil {
+		log.Fatalf("Error loading .env file: %v", err)
+	}
 
 	dbConn, err := db.NewConnection(envs)
 	if err != nil {
